@@ -250,7 +250,7 @@ return e("div",{style:{width:"100%"}},
   e("div",{style:{position:"relative",height:12,borderRadius:6,background:"#E5E7EB",overflow:"hidden"},role:"progressbar","aria-valuenow":score,"aria-valuemin":0,"aria-valuemax":100,"aria-label":`Score de saúde financeira: ${score} de 100, classificação ${faixa}`},
     e("div",{style:{height:"100%",borderRadius:6,background:col,width:`${w}%`,transition:"width 1.2s cubic-bezier(0.25,0.46,0.45,0.94)"}})),
   e("div",{className:"score-labels",style:{display:"flex",justifyContent:"space-between",marginTop:6,fontSize:11,color:"#9CA3AF",flexWrap:"wrap",gap:2}},
-    e("span",null,"0.Restrito"),e("span",null,"40.Atenção"),e("span",null,"60.Moderado"),e("span",null,"80.Saudável"),e("span",null,"100")));}
+    e("span",null,"0 · Restrito"),e("span",null,"40 · Atenção"),e("span",null,"60 · Moderado"),e("span",null,"80 · Saudável"),e("span",null,"100")));}
 
 // ═══════════════════════════════════════════════════════════════════
 // DEBT RANGE BAR
@@ -592,7 +592,7 @@ return e("div",null,
     e("a",{href:"https://defin.global","aria-label":"DeFin Global - Ir para o site",style:{display:"flex",alignItems:"center",textDecoration:"none"}},
       e("img",{src:"logo.png",alt:"DeFin",style:{height:40,width:"auto"}}))),
 
-  e("div",{style:{padding:"0 16px"}},
+  e("div",{style:{padding:"32px 16px 0"}},
   // Hero
   scr==="inputs"&&e("div",{className:"hero",style:{textAlign:"center",maxWidth:580,margin:"0 auto",paddingTop:32,paddingBottom:28}},
     e("h1",{style:{fontSize:34,fontWeight:800,color:"#0F172A",margin:"0 0 16px",lineHeight:"1.2",letterSpacing:-.5}},"Qual o nível seguro de endividamento da sua empresa?"),
