@@ -1,0 +1,25 @@
+{
+  "name": "@defin/calculadora-engine",
+  "version": "1.0.0",
+  "description": "Motor de cálculo da Calculadora de Capacidade de Endividamento — DeFin Global",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsx src/tests.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "calculadora",
+    "endividamento",
+    "credito",
+    "defin"
+  ],
+  "license": "UNLICENSED",
+  "private": true,
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
