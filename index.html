@@ -589,11 +589,8 @@ const isResults=scr==="results";
 return e("div",{style:{padding:"0 16px"}},
   // Header
   e("header",{className:"site-header"},
-    e("a",{href:"https://defin.global","aria-label":"DeFin Global — Ir para o site",style:{display:"flex",alignItems:"center",gap:10,textDecoration:"none"}},
-      e("svg",{viewBox:"0 0 36 36",width:36,height:36,fill:"none",xmlns:"http://www.w3.org/2000/svg","aria-hidden":"true"},
-        e("rect",{width:36,height:36,rx:8,fill:"#0033A0"}),
-        e("text",{x:5,y:26,fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,fill:"white"},"DF")),
-      e("span",{style:{fontSize:20,fontWeight:700,color:"#0033A0",letterSpacing:-.3}},"DeFin"))),
+    e("a",{href:"https://defin.global","aria-label":"DeFin Global — Ir para o site",style:{display:"flex",alignItems:"center",textDecoration:"none"}},
+      e("img",{src:"logo.png",alt:"DeFin",style:{height:40,width:"auto"}}))),
 
   // Hero
   scr==="inputs"&&e("div",{className:"hero",style:{textAlign:"center",maxWidth:580,margin:"0 auto",paddingTop:24,paddingBottom:28}},
