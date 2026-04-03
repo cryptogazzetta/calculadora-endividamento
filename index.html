@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculadora de Capacidade de Endividamento — DeFin Global</title>
-<meta name="description" content="Descubra sua faixa ideal de dívida em 3 minutos — com base em métricas reais de mercado. Metodologia Damodaran/NYU, JPMorgan, OCDE.">
-<meta property="og:title" content="Qual o nível seguro de endividamento da sua empresa? — DeFin Global">
+<title>Calculadora de Capacidade de Endividamento | DeFin Global</title>
+<meta name="description" content="Descubra sua faixa ideal de dívida em 3 minutos, com base em métricas reais de mercado.">
+<meta property="og:title" content="Qual o nível seguro de endividamento da sua empresa? | DeFin Global">
 <meta property="og:description" content="Calculadora gratuita de capacidade de endividamento. 5 métricas, 3 cenários, resultado em 3 minutos.">
 <meta property="og:type" content="website">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230033A0'/%3E%3Ctext x='4' y='24' font-family='sans-serif' font-size='22' font-weight='800' fill='white'%3EDF%3C/text%3E%3C/svg%3E">
@@ -35,7 +35,7 @@ a:hover{text-decoration:underline}
 }
 
 /* Header */
-.site-header{max-width:800px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between}
+.site-header{background:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #E5E7EB}
 .site-header img,.site-header svg{height:36px;width:auto}
 
 /* Widget */
@@ -81,7 +81,7 @@ a:hover{text-decoration:underline}
 const e=React.createElement,{useState,useRef,useEffect,useCallback,useMemo}=React;
 
 // ═══════════════════════════════════════════════════════════════════
-// ENGINE (mirrors calculadora-engine/src/*.ts — 100% fidelity)
+// ENGINE (mirrors calculadora-engine/src/*.ts.100% fidelity)
 // ═══════════════════════════════════════════════════════════════════
 
 const Setor={TECNOLOGIA_SAAS:"tecnologia_saas",SERVICOS_PROFISSIONAIS:"servicos_profissionais",INDUSTRIA_MANUFATURA:"industria_manufatura",COMERCIO_VAREJO:"comercio_varejo",AGRONEGOCIO:"agronegocio",SAUDE_EDUCACAO:"saude_educacao",LOGISTICA_TRANSPORTE:"logistica_transporte",CONSTRUCAO_INFRA:"construcao_infra",OUTROS:"outros"};
@@ -100,7 +100,7 @@ const SETORES_LIST=[
 const SM=Object.fromEntries(SETORES_LIST.map(s=>[s.id,s]));
 const P={TAX:.34,PT:.66,TERM:5,AMORT:.2,RATE:.1425};
 
-// Scoring: [threshold, points, band] — ordered high→low
+// Scoring: [threshold, points, band].ordered high→low
 const SC_DE=[[5,0,"vermelho"],[3.5,5,"laranja"],[3,10,"amarelo"],[2,15,"amarelo"],[1,20,"verde"],[0,25,"verde"]];
 const SC_ICR=[[6,20,"verde"],[4.5,16,"verde"],[3.5,12,"amarelo"],[2.5,8,"amarelo"],[1.5,4,"laranja"],[0,0,"vermelho"]];
 const SC_DSCR=[[2,25,"verde"],[1.5,20,"verde"],[1.25,15,"amarelo"],[1.1,8,"laranja"],[1,3,"laranja"],[0,0,"vermelho"]];
@@ -113,14 +113,14 @@ function sft(v,t,inv){
   return{pts:t[t.length-1][1],band:t[t.length-1][2]};
 }
 
-const MN={d_ebitda:{n:"Alavancagem — Dívida sobre lucro operacional",c:"Dívida/EBITDA"},icr:{n:"Cobertura de juros — Lucro vs. despesa financeira",c:"ICR"},dscr:{n:"Cobertura do serviço da dívida — Caixa vs. parcelas",c:"DSCR"},ncg_receita:{n:"Capital preso no giro — % da receita no ciclo operacional",c:"NCG/Receita"},cfads_receita:{n:"Caixa disponível para dívida — % da receita livre",c:"CFADS/Receita"}};
+const MN={d_ebitda:{n:"Alavancagem: dívida sobre lucro operacional",c:"Dívida/EBITDA"},icr:{n:"Cobertura de juros: lucro vs. despesa financeira",c:"ICR"},dscr:{n:"Cobertura do serviço da dívida: caixa vs. parcelas",c:"DSCR"},ncg_receita:{n:"Capital preso no giro: % da receita no ciclo operacional",c:"NCG/Receita"},cfads_receita:{n:"Caixa disponível para dívida: % da receita livre",c:"CFADS/Receita"}};
 
 const MR={
-d_ebitda:{verde:"Abaixo de 2.0x — a dívida é menor que 2 anos de lucro operacional. Confortável para a maioria dos setores e bem vista por bancos.",amarelo:"Entre 2.0x e 3.5x — a dívida equivale a 2–3,5 anos de lucro operacional. Dentro da faixa de mercado, mas exige monitoramento trimestral.",laranja:"Entre 3.5x e 5.0x — a dívida supera 3,5 anos de lucro operacional. Credores costumam exigir garantias adicionais ou spreads maiores.",vermelho:"Acima de 5.0x — a dívida levaria mais de 5 anos de lucro operacional para ser quitada. Risco elevado de não conseguir refinanciar no vencimento."},
-icr:{verde:"Acima de 4.5x — o lucro operacional cobre os juros com folga de 4,5 vezes. Perfil equivalente a empresas com classificação de crédito A- ou superior.",amarelo:"Entre 2.5x e 4.5x — o lucro cobre os juros entre 2,5 e 4,5 vezes. Margem suficiente, mas sem grande folga para absorver quedas de receita.",laranja:"Entre 1.5x e 2.5x — o lucro operacional mal supera a despesa de juros. Qualquer queda na receita pode comprometer o pagamento.",vermelho:"Abaixo de 1.5x — zona crítica. O lucro operacional quase não cobre os juros, e qualquer oscilação pode gerar inadimplência."},
-dscr:{verde:"Acima de 1.50x — o caixa livre cobre juros + amortização com folga de 50% ou mais. Posição sólida para tomar crédito.",amarelo:"Entre 1.25x e 1.50x — o caixa cobre a dívida, mas está no limite do que bancos costumam exigir como mínimo em contratos (covenant de 1,25x).",laranja:"Entre 1.05x e 1.25x — o caixa cobre a dívida por pouco. Abaixo do covenant padrão de mercado, o que pode gerar restrições contratuais.",vermelho:"Abaixo de 1.05x — o caixa gerado é insuficiente para pagar juros e amortização. A empresa precisaria de caixa acumulado ou novas captações."},
-ncg_receita:{verde:"Até 12% da receita presa no ciclo operacional — eficiente. Sobra mais caixa livre para pagar dívida ou investir.",amarelo:"12% a 20% — nível normal, compatível com a média de grandes empresas. Há oportunidade de melhorar negociando prazos com fornecedores e clientes.",laranja:"20% a 30% — parte significativa da receita fica travada entre estoque, contas a receber e contas a pagar. Reduz o caixa disponível para dívida.",vermelho:"Acima de 30% — o ciclo de caixa longo compromete seriamente a geração de caixa. Priorize encurtar prazos de recebimento e estoque."},
-cfads_receita:{verde:"Acima de 8% da receita convertida em caixa livre para dívida — geração robusta. Base sólida para tomar crédito com segurança.",amarelo:"5% a 8% — geração de caixa moderada. Endividamento é possível, mas a margem de segurança é limitada se a receita cair.",laranja:"2% a 5% — pouco caixa sobra após impostos e manutenção. Apenas dívidas muito conservadoras são recomendadas.",vermelho:"Abaixo de 2% — quase nada sobra de caixa. Antes de pensar em crédito, priorize aumentar a margem operacional ou reduzir custos fixos."}};
+d_ebitda:{verde:"Abaixo de 2.0x.a dívida é menor que 2 anos de lucro operacional. Confortável para a maioria dos setores e bem vista por bancos.",amarelo:"Entre 2.0x e 3.5x.a dívida equivale a 2–3,5 anos de lucro operacional. Dentro da faixa de mercado, mas exige monitoramento trimestral.",laranja:"Entre 3.5x e 5.0x.a dívida supera 3,5 anos de lucro operacional. Credores costumam exigir garantias adicionais ou spreads maiores.",vermelho:"Acima de 5.0x.a dívida levaria mais de 5 anos de lucro operacional para ser quitada. Risco elevado de não conseguir refinanciar no vencimento."},
+icr:{verde:"Acima de 4.5x.o lucro operacional cobre os juros com folga de 4,5 vezes. Perfil equivalente a empresas com classificação de crédito A- ou superior.",amarelo:"Entre 2.5x e 4.5x.o lucro cobre os juros entre 2,5 e 4,5 vezes. Margem suficiente, mas sem grande folga para absorver quedas de receita.",laranja:"Entre 1.5x e 2.5x.o lucro operacional mal supera a despesa de juros. Qualquer queda na receita pode comprometer o pagamento.",vermelho:"Abaixo de 1.5x.zona crítica. O lucro operacional quase não cobre os juros, e qualquer oscilação pode gerar inadimplência."},
+dscr:{verde:"Acima de 1.50x.o caixa livre cobre juros + amortização com folga de 50% ou mais. Posição sólida para tomar crédito.",amarelo:"Entre 1.25x e 1.50x.o caixa cobre a dívida, mas está no limite do que bancos costumam exigir como mínimo em contratos (covenant de 1,25x).",laranja:"Entre 1.05x e 1.25x.o caixa cobre a dívida por pouco. Abaixo do covenant padrão de mercado, o que pode gerar restrições contratuais.",vermelho:"Abaixo de 1.05x.o caixa gerado é insuficiente para pagar juros e amortização. A empresa precisaria de caixa acumulado ou novas captações."},
+ncg_receita:{verde:"Até 12% da receita presa no ciclo operacional.eficiente. Sobra mais caixa livre para pagar dívida ou investir.",amarelo:"12% a 20%.nível normal, compatível com a média de grandes empresas. Há oportunidade de melhorar negociando prazos com fornecedores e clientes.",laranja:"20% a 30%.parte significativa da receita fica travada entre estoque, contas a receber e contas a pagar. Reduz o caixa disponível para dívida.",vermelho:"Acima de 30%.o ciclo de caixa longo compromete seriamente a geração de caixa. Priorize encurtar prazos de recebimento e estoque."},
+cfads_receita:{verde:"Acima de 8% da receita convertida em caixa livre para dívida.geração robusta. Base sólida para tomar crédito com segurança.",amarelo:"5% a 8%.geração de caixa moderada. Endividamento é possível, mas a margem de segurança é limitada se a receita cair.",laranja:"2% a 5%.pouco caixa sobra após impostos e manutenção. Apenas dívidas muito conservadoras são recomendadas.",vermelho:"Abaixo de 2%.quase nada sobra de caixa. Antes de pensar em crédito, priorize aumentar a margem operacional ou reduzir custos fixos."}};
 
 // --- Formatters ---
 function fM(v){if(v===0)return"R$ 0";const neg=v<0,a=Math.abs(v);let s;
@@ -149,14 +149,14 @@ else{const v=rDiv/ebitda,r=sft(v,SC_DE,true);ms.push({id:"d_ebitda",v,fmt:fX(v),
 
 // ICR
 if(!td)ms.push({id:"icr",v:Infinity,fmt:"∞",pts:20,mx:20,b:"verde",ref:"Sem dívida financeira, não há despesa de juros a cobrir. Este indicador passará a ser relevante quando houver endividamento.",ap:false});
-else if(df<=0)ms.push({id:"icr",v:Infinity,fmt:"∞",pts:20,mx:20,b:"verde",ref:"Sua dívida não gera despesa de juros no momento — cobertura plena.",ap:true});
-else{const v=ebitda/df;if(v<0)ms.push({id:"icr",v,fmt:fX(v),pts:0,mx:20,b:"vermelho",ref:"O lucro operacional (EBITDA) é negativo — a empresa opera no prejuízo antes mesmo de pagar juros.",ap:true});
+else if(df<=0)ms.push({id:"icr",v:Infinity,fmt:"∞",pts:20,mx:20,b:"verde",ref:"Sua dívida não gera despesa de juros no momento.cobertura plena.",ap:true});
+else{const v=ebitda/df;if(v<0)ms.push({id:"icr",v,fmt:fX(v),pts:0,mx:20,b:"vermelho",ref:"O lucro operacional (EBITDA) é negativo.a empresa opera no prejuízo antes mesmo de pagar juros.",ap:true});
 else{const r=sft(v,SC_ICR,false);ms.push({id:"icr",v,fmt:fX(v),pts:r.pts,mx:20,b:r.band,ref:MR.icr[r.band],ap:true});}}
 
 // DSCR
 if(!td)ms.push({id:"dscr",v:Infinity,fmt:"∞",pts:25,mx:25,b:"verde",ref:"Sem dívida, não há parcelas a pagar. Quando houver endividamento, esta métrica mostrará se o caixa gerado cobre juros + amortização do principal.",ap:false});
 else if(srv<=0)ms.push({id:"dscr",v:Infinity,fmt:"∞",pts:25,mx:25,b:"verde",ref:"Não há parcelas de dívida a pagar. Todo o caixa operacional está livre.",ap:true});
-else{const v=cfads/srv;if(v<0)ms.push({id:"dscr",v,fmt:fX(v),pts:0,mx:25,b:"vermelho",ref:"O caixa disponível para dívida (CFADS) é negativo — a operação não gera dinheiro suficiente após impostos e manutenção para pagar qualquer parcela.",ap:true});
+else{const v=cfads/srv;if(v<0)ms.push({id:"dscr",v,fmt:fX(v),pts:0,mx:25,b:"vermelho",ref:"O caixa disponível para dívida (CFADS) é negativo.a operação não gera dinheiro suficiente após impostos e manutenção para pagar qualquer parcela.",ap:true});
 else{const r=sft(v,SC_DSCR,false);ms.push({id:"dscr",v,fmt:fX(v),pts:r.pts,mx:25,b:r.band,ref:MR.dscr[r.band],ap:true});}}
 
 // NCG/Receita
@@ -166,7 +166,7 @@ else{const r=sft(v,SC_DSCR,false);ms.push({id:"dscr",v,fmt:fX(v),pts:r.pts,mx:25
 
 let sp=ms.reduce((a,m)=>a+m.pts,0),pen=0,penR=null;
 if(!td){if(cfads<0){pen=-25;penR="Atenção: depois de descontar impostos (34%) e o investimento mínimo de manutenção, sua operação não gera caixa livre (CFADS negativo). O score foi reduzido em 25 pontos para refletir essa limitação.";}
-else if(cfadsP<2){pen=-15;penR="Atenção: o caixa livre após impostos e manutenção representa menos de 2% da receita — um nível muito baixo para sustentar dívida. O score foi reduzido em 15 pontos.";}}
+else if(cfadsP<2){pen=-15;penR="Atenção: o caixa livre após impostos e manutenção representa menos de 2% da receita.um nível muito baixo para sustentar dívida. O score foi reduzido em 15 pontos.";}}
 const score=Math.max(0,Math.min(100,sp+pen));
 const faixa=score>=80?"verde":score>=60?"amarelo":score>=40?"laranja":"vermelho";
 const faixaL=score>=80?"Saudável":score>=60?"Moderado":score>=40?"Atenção":"Restrito";
@@ -190,28 +190,28 @@ const cons=cens[0],base=cens[1],otm=cens[2];
 let res=null;if(td)res={cons:cons.cap-rDiv,base:base.cap-rDiv,otm:otm.cap-rDiv};
 
 // Headlines
-const hl={verde:{sem:"Os indicadores financeiros da sua empresa mostram uma base sólida para buscar crédito com segurança.",com:"Sua estrutura de dívida está saudável — os indicadores mostram que a empresa consegue honrar os compromissos com folga."},
-amarelo:{sem:"Sua empresa pode acessar crédito, mas é importante respeitar os limites indicados para não comprometer o caixa.",com:"A dívida atual está em nível moderado — ainda há espaço para novas captações, mas com atenção aos indicadores de cobertura."},
-laranja:{sem:"Os números da sua empresa pedem cautela: há limitações no caixa ou no ciclo operacional que reduzem a capacidade de endividamento.",com:"O nível de endividamento atual exige atenção — alguns indicadores estão próximos do limite que credores costumam exigir."},
+const hl={verde:{sem:"Os indicadores financeiros da sua empresa mostram uma base sólida para buscar crédito com segurança.",com:"Sua estrutura de dívida está saudável.os indicadores mostram que a empresa consegue honrar os compromissos com folga."},
+amarelo:{sem:"Sua empresa pode acessar crédito, mas é importante respeitar os limites indicados para não comprometer o caixa.",com:"A dívida atual está em nível moderado.ainda há espaço para novas captações, mas com atenção aos indicadores de cobertura."},
+laranja:{sem:"Os números da sua empresa pedem cautela: há limitações no caixa ou no ciclo operacional que reduzem a capacidade de endividamento.",com:"O nível de endividamento atual exige atenção.alguns indicadores estão próximos do limite que credores costumam exigir."},
 vermelho:{sem:"A operação atual não gera caixa suficiente para sustentar dívida. É importante fortalecer a rentabilidade antes de buscar crédito.",com:"O endividamento está acima do que a geração de caixa consegue sustentar. Priorize renegociar condições ou reduzir o saldo devedor."}};
 
 const ctas={verde:{t:"Quero meu diagnóstico completo",x:"Com um perfil saudável como o seu, um especialista pode ajudar a identificar as melhores condições de taxa, prazo e instrumento de crédito."},
 amarelo:{t:"Receber diagnóstico personalizado",x:"Seu perfil tem potencial, mas alguns ajustes podem ampliar significativamente a capacidade de crédito. Um diagnóstico personalizado mostra exatamente onde atuar."},
-laranja:{t:"Analisar opções com especialista",x:"Existem caminhos para fortalecer seus indicadores antes de captar — e escolher o instrumento certo faz toda a diferença. Vamos mapear juntos."},
+laranja:{t:"Analisar opções com especialista",x:"Existem caminhos para fortalecer seus indicadores antes de captar.e escolher o instrumento certo faz toda a diferença. Vamos mapear juntos."},
 vermelho:{t:"Diagnóstico gratuito e urgente",x:"Antes de pensar em nova dívida, é essencial entender quais ajustes operacionais podem melhorar rapidamente a sua capacidade de crédito."}};
 
 // Insight
 let ins={t:"",tx:"",a:""};
-if(fraca.id==="ncg_receita"){const l=(receita/365)*10;ins={t:"Otimize seu ciclo de caixa",tx:`O capital de giro (dinheiro preso entre comprar insumos e receber dos clientes) é o principal gargalo da sua empresa. Hoje, esse capital preso representa ${fraca.fmt} da sua receita — quanto maior esse percentual, menos caixa sobra para pagar dívida.`,a:`Na prática: cada 10 dias a menos no ciclo de caixa (por exemplo, antecipando recebíveis ou negociando prazo com fornecedores) libera cerca de ${fM(l)} em capital de giro.`};}
+if(fraca.id==="ncg_receita"){const l=(receita/365)*10;ins={t:"Otimize seu ciclo de caixa",tx:`O capital de giro (dinheiro preso entre comprar insumos e receber dos clientes) é o principal gargalo da sua empresa. Hoje, esse capital preso representa ${fraca.fmt} da sua receita.quanto maior esse percentual, menos caixa sobra para pagar dívida.`,a:`Na prática: cada 10 dias a menos no ciclo de caixa (por exemplo, antecipando recebíveis ou negociando prazo com fornecedores) libera cerca de ${fM(l)} em capital de giro.`};}
 else if(fraca.id==="cfads_receita"){const l=receita*.01*P.PT;ins={t:"Aumente a geração de caixa livre",tx:`O caixa disponível para pagar dívida (o que sobra após impostos e investimento de manutenção) representa apenas ${fraca.fmt} da sua receita. Esse é o principal limitador da sua capacidade de endividamento.`,a:`Na prática: cada 1 ponto percentual a mais na margem operacional (EBITDA) gera aproximadamente ${fM(l)} adicionais em caixa livre por ano.`};}
 else if(fraca.id==="d_ebitda"){const c2=ebitda*.5*rTaxa;ins={t:"Reduza o peso da dívida sobre o lucro",tx:`A relação dívida/lucro operacional está em ${fraca.fmt}, o que significa que sua dívida equivale a ${fraca.fmt} de lucro operacional anual. ${fraca.v>3.5?"Esse nível está acima do padrão de mercado e pode dificultar novas captações.":"Esse nível está no limite superior do que bancos consideram confortável."}`,a:`Na prática: cada 0,5x de redução nessa relação (via amortização ou aumento de lucro) economiza aproximadamente ${fM(c2)} por ano em despesa financeira.`};}
-else if(fraca.id==="icr"){ins={t:"Melhore a cobertura de juros",tx:`A cobertura de juros (quantas vezes o lucro operacional cobre a despesa de juros) está em ${fraca.fmt}. Isso significa que há pouca margem de segurança — uma queda na receita pode comprometer o pagamento dos juros.`,a:`Na prática: cada 1 ponto percentual de redução na taxa de juros economiza ${fM(rDiv*.01)} por ano e melhora diretamente esse indicador.`};}
-else if(fraca.id==="dscr"){const s7=df+rDiv/7,eco=srv-s7;ins={t:"Alivie o peso das parcelas",tx:`A cobertura do serviço da dívida (caixa livre dividido por juros + amortização) está em ${fraca.fmt}. ${fraca.v<1.25?"Isso está abaixo do mínimo que bancos costumam exigir em contrato (1,25x), o que pode gerar restrições.":"A margem é apertada — qualquer oscilação de caixa pode comprometer o pagamento."}`,a:eco>0?`Na prática: alongar o prazo da dívida de 5 para 7 anos reduziria as parcelas anuais em aproximadamente ${fM(eco)}, aliviando o fluxo de caixa.`:"Na prática: aumente a margem operacional em 2–3 pontos percentuais para gerar mais caixa livre e melhorar essa cobertura."};}
+else if(fraca.id==="icr"){ins={t:"Melhore a cobertura de juros",tx:`A cobertura de juros (quantas vezes o lucro operacional cobre a despesa de juros) está em ${fraca.fmt}. Isso significa que há pouca margem de segurança.uma queda na receita pode comprometer o pagamento dos juros.`,a:`Na prática: cada 1 ponto percentual de redução na taxa de juros economiza ${fM(rDiv*.01)} por ano e melhora diretamente esse indicador.`};}
+else if(fraca.id==="dscr"){const s7=df+rDiv/7,eco=srv-s7;ins={t:"Alivie o peso das parcelas",tx:`A cobertura do serviço da dívida (caixa livre dividido por juros + amortização) está em ${fraca.fmt}. ${fraca.v<1.25?"Isso está abaixo do mínimo que bancos costumam exigir em contrato (1,25x), o que pode gerar restrições.":"A margem é apertada.qualquer oscilação de caixa pode comprometer o pagamento."}`,a:eco>0?`Na prática: alongar o prazo da dívida de 5 para 7 anos reduziria as parcelas anuais em aproximadamente ${fM(eco)}, aliviando o fluxo de caixa.`:"Na prática: aumente a margem operacional em 2–3 pontos percentuais para gerar mais caixa livre e melhorar essa cobertura."};}
 
 const recs=[];
-const mRec={d_ebitda:`O peso da dívida sobre o lucro operacional (${fraca.fmt}) está acima do ideal. Considere fazer amortizações antecipadas ou buscar aumentar o lucro operacional para reduzir essa proporção.`,icr:`A cobertura de juros (${fraca.fmt}) está abaixo do ideal — o lucro operacional mal cobre os juros. Busque renegociar taxas menores ou aumente a rentabilidade da operação.`,dscr:`A cobertura do serviço da dívida (${fraca.fmt}) é o maior limitador. Aumente a margem operacional ou negocie prazos mais longos para reduzir o valor das parcelas anuais.`,ncg_receita:`O capital preso no ciclo operacional (${fraca.fmt} da receita) está alto e reduz o caixa disponível. Renegocie prazos de pagamento com fornecedores e encurte o prazo de recebimento dos clientes.`,cfads_receita:`O caixa livre para dívida (${fraca.fmt} da receita) é baixo. Priorize aumentar a margem operacional ou reduzir gastos com manutenção e investimentos recorrentes.`};
+const mRec={d_ebitda:`O peso da dívida sobre o lucro operacional (${fraca.fmt}) está acima do ideal. Considere fazer amortizações antecipadas ou buscar aumentar o lucro operacional para reduzir essa proporção.`,icr:`A cobertura de juros (${fraca.fmt}) está abaixo do ideal.o lucro operacional mal cobre os juros. Busque renegociar taxas menores ou aumente a rentabilidade da operação.`,dscr:`A cobertura do serviço da dívida (${fraca.fmt}) é o maior limitador. Aumente a margem operacional ou negocie prazos mais longos para reduzir o valor das parcelas anuais.`,ncg_receita:`O capital preso no ciclo operacional (${fraca.fmt} da receita) está alto e reduz o caixa disponível. Renegocie prazos de pagamento com fornecedores e encurte o prazo de recebimento dos clientes.`,cfads_receita:`O caixa livre para dívida (${fraca.fmt} da receita) é baixo. Priorize aumentar a margem operacional ou reduzir gastos com manutenção e investimentos recorrentes.`};
 recs.push(mRec[fraca.id]);
-if(faixa==="verde"||faixa==="amarelo"){recs.push(td?"Aproveite a posição saudável para renegociar taxas e condições com seus credores — empresas com bons indicadores conseguem spreads (margens sobre o CDI) menores.":"Para a primeira operação de crédito, prefira o sistema SAC (parcelas decrescentes) com prazo de 3 a 5 anos — é o formato mais eficiente para quem está começando a usar dívida.");recs.push("Acompanhe trimestralmente a relação dívida/lucro operacional e a cobertura do serviço da dívida. São os dois indicadores que bancos mais observam.");}
+if(faixa==="verde"||faixa==="amarelo"){recs.push(td?"Aproveite a posição saudável para renegociar taxas e condições com seus credores.empresas com bons indicadores conseguem spreads (margens sobre o CDI) menores.":"Para a primeira operação de crédito, prefira o sistema SAC (parcelas decrescentes) com prazo de 3 a 5 anos.é o formato mais eficiente para quem está começando a usar dívida.");recs.push("Acompanhe trimestralmente a relação dívida/lucro operacional e a cobertura do serviço da dívida. São os dois indicadores que bancos mais observam.");}
 else if(faixa==="laranja"){recs.push("Se decidir captar crédito, prefira linhas que ofereçam carência de amortização (6–12 meses sem pagar principal), dando tempo para a operação gerar mais caixa.");recs.push("Considere instrumentos de capital de giro, como desconto de recebíveis ou fundos de direitos creditórios (FIDC), que não aumentam a dívida financeira no balanço.");}
 else{if(td){recs.push("Priorize renegociar prazos e condições com os credores atuais antes de buscar novas captações.");recs.push("Avalie a possibilidade de converter parte da dívida em participação societária (equity), reduzindo o peso das parcelas sobre o caixa.");}else recs.push("O foco agora deve ser aumentar a margem operacional (diferença entre receita e custos), gerando mais caixa livre antes de pensar em crédito.");}
 
@@ -250,7 +250,7 @@ return e("div",{style:{width:"100%"}},
   e("div",{style:{position:"relative",height:12,borderRadius:6,background:"#E5E7EB",overflow:"hidden"},role:"progressbar","aria-valuenow":score,"aria-valuemin":0,"aria-valuemax":100,"aria-label":`Score de saúde financeira: ${score} de 100, classificação ${faixa}`},
     e("div",{style:{height:"100%",borderRadius:6,background:col,width:`${w}%`,transition:"width 1.2s cubic-bezier(0.25,0.46,0.45,0.94)"}})),
   e("div",{className:"score-labels",style:{display:"flex",justifyContent:"space-between",marginTop:6,fontSize:11,color:"#9CA3AF",flexWrap:"wrap",gap:2}},
-    e("span",null,"0 — Restrito"),e("span",null,"40 — Atenção"),e("span",null,"60 — Moderado"),e("span",null,"80 — Saudável"),e("span",null,"100")));}
+    e("span",null,"0.Restrito"),e("span",null,"40.Atenção"),e("span",null,"60.Moderado"),e("span",null,"80.Saudável"),e("span",null,"100")));}
 
 // ═══════════════════════════════════════════════════════════════════
 // DEBT RANGE BAR
@@ -340,7 +340,7 @@ return e("div",{style:{marginBottom:20}},
     options.map(o=>e("option",{key:o.v,value:o.v},o.l))));}
 
 // ═══════════════════════════════════════════════════════════════════
-// SCREEN 1 — INPUTS
+// SCREEN 1.INPUTS
 // ═══════════════════════════════════════════════════════════════════
 function Screen1({onCalc,init}){
 const[rec,setRec]=useState(init?.rec||"");
@@ -392,7 +392,7 @@ return e("form",{onSubmit:submit,noValidate:true},
     e("p",{style:{fontSize:15,color:"#6B7280",margin:0,lineHeight:"1.5"}},"Preencha os dados abaixo para ver sua faixa segura de dívida.")),
 
   e("div",{style:ss("rec")},e(InputField,{id:"i-rec",label:"Receita anual bruta (R$)",placeholder:"Ex: 30.000.000",value:rec,onChange:setRec,inputMode:"numeric",required:true,error:tch.rec&&errs.rec,onBlur:()=>setTch(t=>({...t,rec:true})),help:"O faturamento total bruto da empresa nos últimos 12 meses (antes de descontar impostos sobre vendas). Se a empresa tem menos de 12 meses, multiplique a receita mensal média por 12."})),
-  e("div",{style:ss("mar")},e(InputField,{id:"i-mar",label:"Margem EBITDA (%)",placeholder:"Ex: 15",suffix:"%",value:mar,onChange:setMar,inputMode:"decimal",required:true,error:tch.mar&&errs.mar,warning:wrn.mar,onBlur:()=>setTch(t=>({...t,mar:true})),help:"O EBITDA é o lucro operacional antes de juros, impostos, depreciação e amortização — ou seja, quanto a operação gera de lucro por si mesma. A margem EBITDA é esse valor dividido pela receita, em percentual. Referências por setor: Tecnologia 20–35%, Serviços 12–22%, Indústria 8–18%, Comércio 4–10%."})),
+  e("div",{style:ss("mar")},e(InputField,{id:"i-mar",label:"Margem EBITDA (%)",placeholder:"Ex: 15",suffix:"%",value:mar,onChange:setMar,inputMode:"decimal",required:true,error:tch.mar&&errs.mar,warning:wrn.mar,onBlur:()=>setTch(t=>({...t,mar:true})),help:"O EBITDA é o lucro operacional antes de juros, impostos, depreciação e amortização.ou seja, quanto a operação gera de lucro por si mesma. A margem EBITDA é esse valor dividido pela receita, em percentual. Referências por setor: Tecnologia 20–35%, Serviços 12–22%, Indústria 8–18%, Comércio 4–10%."})),
   e("div",{style:ss("cic")},e(InputField,{id:"i-cic",label:"Ciclo de caixa (dias)",placeholder:"Ex: 75",suffix:"dias",value:cic,onChange:setCic,inputMode:"numeric",required:true,error:tch.cic&&errs.cic,warning:wrn.cic,onBlur:()=>setTch(t=>({...t,cic:true})),help:"O ciclo de caixa mede quantos dias o dinheiro fica 'preso' na operação. Cálculo: prazo médio de recebimento (PMR) + prazo médio de estoque (PME) − prazo médio de pagamento a fornecedores (PMP). Quanto maior, mais capital de giro a empresa precisa. Referências: Tecnologia 30–50 dias, Serviços 30–60, Indústria 60–120, Comércio 20–50."})),
 
   // Accordion
@@ -403,7 +403,7 @@ return e("form",{onSubmit:submit,noValidate:true},
       e("svg",{width:16,height:16,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:2,strokeLinecap:"round",strokeLinejoin:"round",
         style:{transform:optO?"rotate(180deg)":"rotate(0deg)",transition:"transform 200ms ease",flexShrink:0}},
         e("polyline",{points:"6 9 12 15 18 9"})),
-      e("span",null,optO?"Campos opcionais — quanto mais dados, mais preciso":"Refinar meu resultado (opcional)")),
+      e("span",null,optO?"Campos opcionais.quanto mais dados, mais preciso":"Refinar meu resultado (opcional)")),
     e("div",{style:{maxHeight:optO?600:0,overflow:"hidden",transition:"max-height .35s cubic-bezier(0.16,1,0.3,1),opacity .25s ease",opacity:optO?1:0,marginTop:optO?16:0}},
       e(SelectField,{id:"i-set",label:"Setor de atuação",value:set,onChange:setSet,placeholder:"Selecione seu setor",options:SETORES_LIST.map(s=>({v:s.id,l:s.nome}))}),
       e(InputField,{id:"i-div",label:"Dívida bruta atual (R$)",placeholder:"Ex: 5.000.000",value:div,onChange:setDiv,inputMode:"numeric",help:"A soma de todos os empréstimos bancários, financiamentos, debêntures e outras dívidas financeiras (de curto e longo prazo). Não inclua contas a pagar do dia a dia (fornecedores, salários, impostos)."}),
@@ -419,7 +419,7 @@ return e("form",{onSubmit:submit,noValidate:true},
     canS?"Ver meu resultado":"Preencha os 3 campos acima para continuar"));}
 
 // ═══════════════════════════════════════════════════════════════════
-// SCREEN 2 — PROCESSING
+// SCREEN 2.PROCESSING
 // ═══════════════════════════════════════════════════════════════════
 function Screen2(){
 const[step,setStep]=useState(0);
@@ -435,11 +435,11 @@ return e("div",{style:{display:"flex",flexDirection:"column",alignItems:"center"
       i===step&&e("span",{style:{color:"#2563EB",marginRight:6}},"●"),s))));}
 
 // ═══════════════════════════════════════════════════════════════════
-// SCREEN 3 — RESULTS
+// SCREEN 3.RESULTS
 // ═══════════════════════════════════════════════════════════════════
 function Screen3({r,onRecalc,onCapture}){
 const c=BC[r.faixa];
-const valueBullets=["Análise completa da sua estrutura de capital e capacidade de endividamento","Simulação com taxas e prazos reais de mercado para seu perfil","Recomendações de instrumento de crédito (fundos, debêntures, notas comerciais)","Conversa individual com especialista DeFin — sem compromisso"];
+const valueBullets=["Análise completa da sua estrutura de capital e capacidade de endividamento","Simulação com taxas e prazos reais de mercado para seu perfil","Recomendações de instrumento de crédito (fundos, debêntures, notas comerciais)","Conversa individual com especialista DeFin.sem compromisso"];
 return e("div",null,
   // Block 1: Headline + Score
   e(FadeIn,{delay:0},
@@ -503,7 +503,7 @@ return e("div",null,
       onMouseLeave:ev=>{ev.target.style.background="none";}},"← Recalcular")));}
 
 // ═══════════════════════════════════════════════════════════════════
-// SCREEN 4 — CAPTURE
+// SCREEN 4.CAPTURE
 // ═══════════════════════════════════════════════════════════════════
 function Screen4({onSubmit,onBack}){
 const[em,setEm]=useState("");const[nm,setNm]=useState("");const[emp,setEmp]=useState("");
@@ -538,7 +538,7 @@ return e("form",{onSubmit:submit,noValidate:true},
 );}
 
 // ═══════════════════════════════════════════════════════════════════
-// SCREEN 5 — CONFIRMATION
+// SCREEN 5.CONFIRMATION
 // ═══════════════════════════════════════════════════════════════════
 function Screen5({email}){
 const[show,setShow]=useState(false);
@@ -547,7 +547,7 @@ const IC=t=>{const p={article:"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0
   return e("svg",{width:20,height:20,viewBox:"0 0 24 24",fill:"none",stroke:"#2563EB",strokeWidth:2,strokeLinecap:"round",strokeLinejoin:"round",style:{flexShrink:0,marginTop:2}},
     (p[t]||"").split(" M").map((d,i)=>e("path",{key:i,d:i===0?d:"M"+d})));};
 const links=[{i:"article",t:"Qual o nível seguro de endividamento? Guia prático para empresas em crescimento",s:"Artigo no blog"},
-{i:"chart",t:"5 Mitos sobre Endividamento — série no LinkedIn",s:"Carrossel LinkedIn"},
+{i:"chart",t:"5 Mitos sobre Endividamento.série no LinkedIn",s:"Carrossel LinkedIn"},
 {i:"download",t:"Baixar meu resultado em PDF",s:"Download direto"}];
 
 return e("div",{style:{textAlign:"center",padding:"20px 0"}},
@@ -589,15 +589,13 @@ const isResults=scr==="results";
 return e("div",{style:{padding:"0 16px"}},
   // Header
   e("header",{className:"site-header"},
-    e("a",{href:"https://defin.global","aria-label":"DeFin Global — Ir para o site",style:{display:"flex",alignItems:"center",textDecoration:"none"}},
+    e("a",{href:"https://defin.global","aria-label":"DeFin Global.Ir para o site",style:{display:"flex",alignItems:"center",textDecoration:"none"}},
       e("img",{src:"logo.png",alt:"DeFin",style:{height:40,width:"auto"}}))),
 
   // Hero
   scr==="inputs"&&e("div",{className:"hero",style:{textAlign:"center",maxWidth:580,margin:"0 auto",paddingTop:24,paddingBottom:28}},
     e("h1",{style:{fontSize:34,fontWeight:800,color:"#0F172A",margin:"0 0 16px",lineHeight:"1.2",letterSpacing:-.5}},"Qual o nível seguro de endividamento da sua empresa?"),
-    e("p",{className:"hero-subtitle",style:{fontSize:17,color:"#4B5563",margin:"0 0 20px",lineHeight:"1.65"}},"Descubra em 3 minutos quanto sua empresa pode tomar de crédito com segurança — usando as mesmas métricas que bancos e fundos analisam antes de emprestar."),
-    e("div",{style:{display:"flex",justifyContent:"center",gap:16,flexWrap:"wrap"}},
-      ["Damodaran/NYU","JPMorgan","OCDE"].map(n=>e("span",{key:n,style:{fontSize:12,fontWeight:500,color:"#6B7280",background:"#F3F4F6",padding:"4px 12px",borderRadius:20,border:"1px solid #E5E7EB"}},n)))),
+    e("p",{className:"hero-subtitle",style:{fontSize:17,color:"#4B5563",margin:"0 0 20px",lineHeight:"1.65"}},"Descubra em 3 minutos quanto sua empresa pode tomar de crédito com segurança, usando as mesmas métricas que bancos e fundos analisam antes de emprestar.")),
 
   // Widget
   e("div",{ref:wRef,className:`widget${scr==="processing"?" widget--processing":""}${isResults?" widget--results":""}`,style:scr==="processing"?{padding:"40px 32px"}:undefined},
