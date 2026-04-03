@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Calculadora de Capacidade de Endividamento — DeFin Global</title>
 <meta name="description" content="Descubra sua faixa ideal de dívida em 3 minutos — com base em métricas reais de mercado. Metodologia Damodaran/NYU, JPMorgan, OCDE.">
-<meta property="og:title" content="Quanto é seguro sua empresa se endividar? — DeFin Global">
+<meta property="og:title" content="Qual o nível seguro de endividamento da sua empresa? — DeFin Global">
 <meta property="og:description" content="Calculadora gratuita de capacidade de endividamento. 5 métricas, 3 cenários, resultado em 3 minutos.">
 <meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230033A0'/%3E%3Ctext x='4' y='24' font-family='sans-serif' font-size='22' font-weight='800' fill='white'%3EDF%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
@@ -28,15 +29,42 @@ a:hover{text-decoration:underline}
 @keyframes scaleIn{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}
 @keyframes barFill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 
-.widget{max-width:640px;margin:0 auto;background:#fff;border-radius:16px;padding:32px 28px;
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+
+/* Header */
+.site-header{max-width:800px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between}
+.site-header img,.site-header svg{height:36px;width:auto}
+
+/* Widget */
+.widget{max-width:680px;margin:0 auto;background:#fff;border-radius:16px;padding:36px 32px;
   box-shadow:0 4px 24px rgba(0,0,0,.06),0 1px 4px rgba(0,0,0,.04);border:1px solid #E5E7EB;
   margin-bottom:40px;transition:padding .3s ease}
-.widget--processing{padding:40px 28px}
+.widget--results{max-width:760px}
+.widget--processing{padding:40px 32px}
+
+/* Step indicator */
+.step-indicator{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:24px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:#D1D5DB;transition:all .3s ease}
+.step-dot--active{background:#2563EB;width:24px;border-radius:4px}
+.step-dot--done{background:#059669}
 
 @media(max-width:767px){
+  .site-header{padding:16px 16px}
+  .site-header img,.site-header svg{height:28px}
   .widget{border-radius:12px;padding:24px 18px;margin:0 12px 32px}
+  .widget--results{margin:0 8px 32px}
   .hero h1{font-size:26px!important}
+  .hero-subtitle{font-size:15px!important}
   .metrics-grid{grid-template-columns:1fr!important}
+  .score-labels{font-size:10px!important}
+  .score-labels span:nth-child(2),.score-labels span:nth-child(4){display:none}
+}
+
+@media(min-width:768px) and (max-width:1024px){
+  .widget--results{max-width:720px}
 }
 
 /* Accessible focus ring */
@@ -85,14 +113,14 @@ function sft(v,t,inv){
   return{pts:t[t.length-1][1],band:t[t.length-1][2]};
 }
 
-const MN={d_ebitda:{n:"Alavancagem (D/EBITDA)",c:"D/EBITDA"},icr:{n:"Cobertura de juros (ICR)",c:"ICR"},dscr:{n:"Cobertura do serviço (DSCR)",c:"DSCR"},ncg_receita:{n:"Capital no giro (NCG/Receita)",c:"NCG/Receita"},cfads_receita:{n:"Caixa para dívida (CFADS/Receita)",c:"CFADS/Receita"}};
+const MN={d_ebitda:{n:"Alavancagem — Dívida sobre lucro operacional",c:"Dívida/EBITDA"},icr:{n:"Cobertura de juros — Lucro vs. despesa financeira",c:"ICR"},dscr:{n:"Cobertura do serviço da dívida — Caixa vs. parcelas",c:"DSCR"},ncg_receita:{n:"Capital preso no giro — % da receita no ciclo operacional",c:"NCG/Receita"},cfads_receita:{n:"Caixa disponível para dívida — % da receita livre",c:"CFADS/Receita"}};
 
 const MR={
-d_ebitda:{verde:"Abaixo de 2.0x — confortável para a maioria dos setores.",amarelo:"Entre 2.0x e 3.5x — dentro da faixa de mercado, mas monitore.",laranja:"Entre 3.5x e 5.0x — acima do padrão; credores podem exigir mais garantias.",vermelho:"Acima de 5.0x — alavancagem elevada; risco de refinanciamento sobe."},
-icr:{verde:"Acima de 4.5x — equivalente a rating A- ou melhor.",amarelo:"Entre 2.5x e 4.5x — rating B+ a BBB; margem suficiente mas sem folga.",laranja:"Entre 1.5x e 2.5x — rating B ou inferior; risco de default sobe.",vermelho:"Abaixo de 1.5x — zona crítica; EBITDA mal cobre os juros."},
-dscr:{verde:"Acima de 1.50x — o caixa operacional cobre dívida com folga de 50%+.",amarelo:"Entre 1.25x e 1.50x — dentro do covenant mínimo de mercado (1.25x).",laranja:"Entre 1.05x e 1.25x — abaixo do covenant padrão; risco de breach.",vermelho:"Abaixo de 1.05x — caixa insuficiente para servir a dívida."},
-ncg_receita:{verde:"Até 12% — ciclo eficiente; mais caixa disponível para dívida.",amarelo:"12% a 20% — normal; média de mercado para empresas Fortune 500.",laranja:"20% a 30% — capital preso no giro operacional reduz capacidade.",vermelho:"Acima de 30% — ciclo de caixa longo compromete geração de caixa."},
-cfads_receita:{verde:"Acima de 8% — geração de caixa robusta; boa base para alavancagem.",amarelo:"5% a 8% — moderada; endividamento possível mas com limites.",laranja:"2% a 5% — fraca; apenas dívidas muito conservadoras.",vermelho:"Abaixo de 2% — insuficiente; priorize aumentar margem operacional."}};
+d_ebitda:{verde:"Abaixo de 2.0x — a dívida é menor que 2 anos de lucro operacional. Confortável para a maioria dos setores e bem vista por bancos.",amarelo:"Entre 2.0x e 3.5x — a dívida equivale a 2–3,5 anos de lucro operacional. Dentro da faixa de mercado, mas exige monitoramento trimestral.",laranja:"Entre 3.5x e 5.0x — a dívida supera 3,5 anos de lucro operacional. Credores costumam exigir garantias adicionais ou spreads maiores.",vermelho:"Acima de 5.0x — a dívida levaria mais de 5 anos de lucro operacional para ser quitada. Risco elevado de não conseguir refinanciar no vencimento."},
+icr:{verde:"Acima de 4.5x — o lucro operacional cobre os juros com folga de 4,5 vezes. Perfil equivalente a empresas com classificação de crédito A- ou superior.",amarelo:"Entre 2.5x e 4.5x — o lucro cobre os juros entre 2,5 e 4,5 vezes. Margem suficiente, mas sem grande folga para absorver quedas de receita.",laranja:"Entre 1.5x e 2.5x — o lucro operacional mal supera a despesa de juros. Qualquer queda na receita pode comprometer o pagamento.",vermelho:"Abaixo de 1.5x — zona crítica. O lucro operacional quase não cobre os juros, e qualquer oscilação pode gerar inadimplência."},
+dscr:{verde:"Acima de 1.50x — o caixa livre cobre juros + amortização com folga de 50% ou mais. Posição sólida para tomar crédito.",amarelo:"Entre 1.25x e 1.50x — o caixa cobre a dívida, mas está no limite do que bancos costumam exigir como mínimo em contratos (covenant de 1,25x).",laranja:"Entre 1.05x e 1.25x — o caixa cobre a dívida por pouco. Abaixo do covenant padrão de mercado, o que pode gerar restrições contratuais.",vermelho:"Abaixo de 1.05x — o caixa gerado é insuficiente para pagar juros e amortização. A empresa precisaria de caixa acumulado ou novas captações."},
+ncg_receita:{verde:"Até 12% da receita presa no ciclo operacional — eficiente. Sobra mais caixa livre para pagar dívida ou investir.",amarelo:"12% a 20% — nível normal, compatível com a média de grandes empresas. Há oportunidade de melhorar negociando prazos com fornecedores e clientes.",laranja:"20% a 30% — parte significativa da receita fica travada entre estoque, contas a receber e contas a pagar. Reduz o caixa disponível para dívida.",vermelho:"Acima de 30% — o ciclo de caixa longo compromete seriamente a geração de caixa. Priorize encurtar prazos de recebimento e estoque."},
+cfads_receita:{verde:"Acima de 8% da receita convertida em caixa livre para dívida — geração robusta. Base sólida para tomar crédito com segurança.",amarelo:"5% a 8% — geração de caixa moderada. Endividamento é possível, mas a margem de segurança é limitada se a receita cair.",laranja:"2% a 5% — pouco caixa sobra após impostos e manutenção. Apenas dívidas muito conservadoras são recomendadas.",vermelho:"Abaixo de 2% — quase nada sobra de caixa. Antes de pensar em crédito, priorize aumentar a margem operacional ou reduzir custos fixos."}};
 
 // --- Formatters ---
 function fM(v){if(v===0)return"R$ 0";const neg=v<0,a=Math.abs(v);let s;
@@ -115,20 +143,20 @@ const df=rDiv*rTaxa,srv=df+rDiv*P.AMORT;
 
 const ms=[];
 // D/EBITDA
-if(!td)ms.push({id:"d_ebitda",v:0,fmt:"0,0x",pts:25,mx:25,b:"verde",ref:"Sem dívida atual — alavancagem zero.",ap:true});
-else if(ebitda<=0)ms.push({id:"d_ebitda",v:Infinity,fmt:"∞",pts:0,mx:25,b:"vermelho",ref:"EBITDA nulo ou negativo.",ap:true});
+if(!td)ms.push({id:"d_ebitda",v:0,fmt:"0,0x",pts:25,mx:25,b:"verde",ref:"Sua empresa não tem dívida registrada, então a alavancagem é zero. Isso significa que todo o lucro operacional está livre para investir ou captar crédito.",ap:true});
+else if(ebitda<=0)ms.push({id:"d_ebitda",v:Infinity,fmt:"∞",pts:0,mx:25,b:"vermelho",ref:"O lucro operacional (EBITDA) é nulo ou negativo, o que torna qualquer nível de dívida insustentável.",ap:true});
 else{const v=rDiv/ebitda,r=sft(v,SC_DE,true);ms.push({id:"d_ebitda",v,fmt:fX(v),pts:r.pts,mx:25,b:r.band,ref:MR.d_ebitda[r.band],ap:true});}
 
 // ICR
-if(!td)ms.push({id:"icr",v:Infinity,fmt:"∞",pts:20,mx:20,b:"verde",ref:"Sem dívida — cobertura não se aplica.",ap:false});
-else if(df<=0)ms.push({id:"icr",v:Infinity,fmt:"∞",pts:20,mx:20,b:"verde",ref:"Sem despesa financeira.",ap:true});
-else{const v=ebitda/df;if(v<0)ms.push({id:"icr",v,fmt:fX(v),pts:0,mx:20,b:"vermelho",ref:"EBITDA negativo.",ap:true});
+if(!td)ms.push({id:"icr",v:Infinity,fmt:"∞",pts:20,mx:20,b:"verde",ref:"Sem dívida financeira, não há despesa de juros a cobrir. Este indicador passará a ser relevante quando houver endividamento.",ap:false});
+else if(df<=0)ms.push({id:"icr",v:Infinity,fmt:"∞",pts:20,mx:20,b:"verde",ref:"Sua dívida não gera despesa de juros no momento — cobertura plena.",ap:true});
+else{const v=ebitda/df;if(v<0)ms.push({id:"icr",v,fmt:fX(v),pts:0,mx:20,b:"vermelho",ref:"O lucro operacional (EBITDA) é negativo — a empresa opera no prejuízo antes mesmo de pagar juros.",ap:true});
 else{const r=sft(v,SC_ICR,false);ms.push({id:"icr",v,fmt:fX(v),pts:r.pts,mx:20,b:r.band,ref:MR.icr[r.band],ap:true});}}
 
 // DSCR
-if(!td)ms.push({id:"dscr",v:Infinity,fmt:"∞",pts:25,mx:25,b:"verde",ref:"Sem dívida — cobertura não se aplica.",ap:false});
-else if(srv<=0)ms.push({id:"dscr",v:Infinity,fmt:"∞",pts:25,mx:25,b:"verde",ref:"Sem serviço da dívida.",ap:true});
-else{const v=cfads/srv;if(v<0)ms.push({id:"dscr",v,fmt:fX(v),pts:0,mx:25,b:"vermelho",ref:"CFADS negativo.",ap:true});
+if(!td)ms.push({id:"dscr",v:Infinity,fmt:"∞",pts:25,mx:25,b:"verde",ref:"Sem dívida, não há parcelas a pagar. Quando houver endividamento, esta métrica mostrará se o caixa gerado cobre juros + amortização do principal.",ap:false});
+else if(srv<=0)ms.push({id:"dscr",v:Infinity,fmt:"∞",pts:25,mx:25,b:"verde",ref:"Não há parcelas de dívida a pagar. Todo o caixa operacional está livre.",ap:true});
+else{const v=cfads/srv;if(v<0)ms.push({id:"dscr",v,fmt:fX(v),pts:0,mx:25,b:"vermelho",ref:"O caixa disponível para dívida (CFADS) é negativo — a operação não gera dinheiro suficiente após impostos e manutenção para pagar qualquer parcela.",ap:true});
 else{const r=sft(v,SC_DSCR,false);ms.push({id:"dscr",v,fmt:fX(v),pts:r.pts,mx:25,b:r.band,ref:MR.dscr[r.band],ap:true});}}
 
 // NCG/Receita
@@ -137,8 +165,8 @@ else{const r=sft(v,SC_DSCR,false);ms.push({id:"dscr",v,fmt:fX(v),pts:r.pts,mx:25
 {const r=sft(cfadsP,SC_CFADS,false);ms.push({id:"cfads_receita",v:cfadsP,fmt:fP(cfadsP),pts:r.pts,mx:15,b:r.band,ref:MR.cfads_receita[r.band],ap:true});}
 
 let sp=ms.reduce((a,m)=>a+m.pts,0),pen=0,penR=null;
-if(!td){if(cfads<0){pen=-25;penR="CFADS negativo: a operação não gera caixa livre após impostos e manutenção. Score ajustado.";}
-else if(cfadsP<2){pen=-15;penR="CFADS/Receita abaixo de 2%: geração de caixa insuficiente. Score ajustado.";}}
+if(!td){if(cfads<0){pen=-25;penR="Atenção: depois de descontar impostos (34%) e o investimento mínimo de manutenção, sua operação não gera caixa livre (CFADS negativo). O score foi reduzido em 25 pontos para refletir essa limitação.";}
+else if(cfadsP<2){pen=-15;penR="Atenção: o caixa livre após impostos e manutenção representa menos de 2% da receita — um nível muito baixo para sustentar dívida. O score foi reduzido em 15 pontos.";}}
 const score=Math.max(0,Math.min(100,sp+pen));
 const faixa=score>=80?"verde":score>=60?"amarelo":score>=40?"laranja":"vermelho";
 const faixaL=score>=80?"Saudável":score>=60?"Moderado":score>=40?"Atenção":"Restrito";
@@ -162,30 +190,30 @@ const cons=cens[0],base=cens[1],otm=cens[2];
 let res=null;if(td)res={cons:cons.cap-rDiv,base:base.cap-rDiv,otm:otm.cap-rDiv};
 
 // Headlines
-const hl={verde:{sem:"Sua empresa tem uma base sólida para buscar crédito.",com:"Sua estrutura de dívida está saudável."},
-amarelo:{sem:"Sua empresa pode acessar crédito, com atenção aos limites.",com:"Sua dívida está em nível moderado — há espaço, mas com ressalvas."},
-laranja:{sem:"O perfil da sua empresa pede cautela no endividamento.",com:"O nível de endividamento exige atenção."},
-vermelho:{sem:"A operação precisa de ajustes antes de buscar crédito.",com:"O endividamento está acima do recomendado."}};
+const hl={verde:{sem:"Os indicadores financeiros da sua empresa mostram uma base sólida para buscar crédito com segurança.",com:"Sua estrutura de dívida está saudável — os indicadores mostram que a empresa consegue honrar os compromissos com folga."},
+amarelo:{sem:"Sua empresa pode acessar crédito, mas é importante respeitar os limites indicados para não comprometer o caixa.",com:"A dívida atual está em nível moderado — ainda há espaço para novas captações, mas com atenção aos indicadores de cobertura."},
+laranja:{sem:"Os números da sua empresa pedem cautela: há limitações no caixa ou no ciclo operacional que reduzem a capacidade de endividamento.",com:"O nível de endividamento atual exige atenção — alguns indicadores estão próximos do limite que credores costumam exigir."},
+vermelho:{sem:"A operação atual não gera caixa suficiente para sustentar dívida. É importante fortalecer a rentabilidade antes de buscar crédito.",com:"O endividamento está acima do que a geração de caixa consegue sustentar. Priorize renegociar condições ou reduzir o saldo devedor."}};
 
-const ctas={verde:{t:"Quero meu diagnóstico",x:"Quer explorar as melhores opções de estruturação para o seu perfil?"},
-amarelo:{t:"Diagnóstico personalizado",x:"Um diagnóstico personalizado pode identificar como otimizar sua capacidade."},
-laranja:{t:"Vamos analisar opções",x:"Podemos ajudar a mapear caminhos para aumentar sua capacidade antes de captar."},
-vermelho:{t:"Diagnóstico urgente — gratuito",x:"Antes de pensar em dívida, vamos entender o que pode mudar nos seus números."}};
+const ctas={verde:{t:"Quero meu diagnóstico completo",x:"Com um perfil saudável como o seu, um especialista pode ajudar a identificar as melhores condições de taxa, prazo e instrumento de crédito."},
+amarelo:{t:"Receber diagnóstico personalizado",x:"Seu perfil tem potencial, mas alguns ajustes podem ampliar significativamente a capacidade de crédito. Um diagnóstico personalizado mostra exatamente onde atuar."},
+laranja:{t:"Analisar opções com especialista",x:"Existem caminhos para fortalecer seus indicadores antes de captar — e escolher o instrumento certo faz toda a diferença. Vamos mapear juntos."},
+vermelho:{t:"Diagnóstico gratuito e urgente",x:"Antes de pensar em nova dívida, é essencial entender quais ajustes operacionais podem melhorar rapidamente a sua capacidade de crédito."}};
 
 // Insight
 let ins={t:"",tx:"",a:""};
-if(fraca.id==="ncg_receita"){const l=(receita/365)*10;ins={t:"Otimize seu ciclo de caixa",tx:`O capital de giro é o principal gargalo. NCG consome ${fraca.fmt} da receita.`,a:`Cada 10 dias a menos no ciclo de caixa libera ${fM(l)} em capital de giro.`};}
-else if(fraca.id==="cfads_receita"){const l=receita*.01*P.PT;ins={t:"Aumente a geração de caixa",tx:`O caixa para dívida (${fraca.fmt} da receita) é o limitador.`,a:`Cada ponto de margem EBITDA gera ${fM(l)} adicionais em CFADS.`};}
-else if(fraca.id==="d_ebitda"){const c2=ebitda*.5*rTaxa;ins={t:"Reduza a alavancagem",tx:`D/EBITDA de ${fraca.fmt} ${fraca.v>3.5?"acima do padrão":"no limite superior"}.`,a:`Cada 0,5x de redução economiza ~${fM(c2)}/ano em despesa financeira.`};}
-else if(fraca.id==="icr"){ins={t:"Melhore a cobertura de juros",tx:`ICR de ${fraca.fmt} indica cobertura sem folga.`,a:`Cada 1pp de redução na taxa economiza ${fM(rDiv*.01)}/ano.`};}
-else if(fraca.id==="dscr"){const s7=df+rDiv/7,eco=srv-s7;ins={t:"Alivie o serviço da dívida",tx:`DSCR de ${fraca.fmt} — ${fraca.v<1.25?"abaixo do covenant mínimo":"margem apertada"}.`,a:eco>0?`Alongar prazo de 5→7 anos reduziria o serviço em ${fM(eco)}/ano.`:"Aumente a margem EBITDA em 2-3pp para melhorar o CFADS."};}
+if(fraca.id==="ncg_receita"){const l=(receita/365)*10;ins={t:"Otimize seu ciclo de caixa",tx:`O capital de giro (dinheiro preso entre comprar insumos e receber dos clientes) é o principal gargalo da sua empresa. Hoje, esse capital preso representa ${fraca.fmt} da sua receita — quanto maior esse percentual, menos caixa sobra para pagar dívida.`,a:`Na prática: cada 10 dias a menos no ciclo de caixa (por exemplo, antecipando recebíveis ou negociando prazo com fornecedores) libera cerca de ${fM(l)} em capital de giro.`};}
+else if(fraca.id==="cfads_receita"){const l=receita*.01*P.PT;ins={t:"Aumente a geração de caixa livre",tx:`O caixa disponível para pagar dívida (o que sobra após impostos e investimento de manutenção) representa apenas ${fraca.fmt} da sua receita. Esse é o principal limitador da sua capacidade de endividamento.`,a:`Na prática: cada 1 ponto percentual a mais na margem operacional (EBITDA) gera aproximadamente ${fM(l)} adicionais em caixa livre por ano.`};}
+else if(fraca.id==="d_ebitda"){const c2=ebitda*.5*rTaxa;ins={t:"Reduza o peso da dívida sobre o lucro",tx:`A relação dívida/lucro operacional está em ${fraca.fmt}, o que significa que sua dívida equivale a ${fraca.fmt} de lucro operacional anual. ${fraca.v>3.5?"Esse nível está acima do padrão de mercado e pode dificultar novas captações.":"Esse nível está no limite superior do que bancos consideram confortável."}`,a:`Na prática: cada 0,5x de redução nessa relação (via amortização ou aumento de lucro) economiza aproximadamente ${fM(c2)} por ano em despesa financeira.`};}
+else if(fraca.id==="icr"){ins={t:"Melhore a cobertura de juros",tx:`A cobertura de juros (quantas vezes o lucro operacional cobre a despesa de juros) está em ${fraca.fmt}. Isso significa que há pouca margem de segurança — uma queda na receita pode comprometer o pagamento dos juros.`,a:`Na prática: cada 1 ponto percentual de redução na taxa de juros economiza ${fM(rDiv*.01)} por ano e melhora diretamente esse indicador.`};}
+else if(fraca.id==="dscr"){const s7=df+rDiv/7,eco=srv-s7;ins={t:"Alivie o peso das parcelas",tx:`A cobertura do serviço da dívida (caixa livre dividido por juros + amortização) está em ${fraca.fmt}. ${fraca.v<1.25?"Isso está abaixo do mínimo que bancos costumam exigir em contrato (1,25x), o que pode gerar restrições.":"A margem é apertada — qualquer oscilação de caixa pode comprometer o pagamento."}`,a:eco>0?`Na prática: alongar o prazo da dívida de 5 para 7 anos reduziria as parcelas anuais em aproximadamente ${fM(eco)}, aliviando o fluxo de caixa.`:"Na prática: aumente a margem operacional em 2–3 pontos percentuais para gerar mais caixa livre e melhorar essa cobertura."};}
 
 const recs=[];
-const mRec={d_ebitda:`Alavancagem (${fraca.fmt}) acima do ideal. Considere amortizações extraordinárias.`,icr:`Cobertura de juros (${fraca.fmt}) abaixo do ideal. Busque taxas menores ou aumente EBITDA.`,dscr:`Cobertura do serviço (${fraca.fmt}) é o maior limitador. Aumente margem ou alongue prazo.`,ncg_receita:`Capital preso no giro (${fraca.fmt}) reduz caixa. Renegocie prazos com fornecedores.`,cfads_receita:`Geração de caixa (${fraca.fmt}) baixa. Priorize margem EBITDA ou reduza capex.`};
+const mRec={d_ebitda:`O peso da dívida sobre o lucro operacional (${fraca.fmt}) está acima do ideal. Considere fazer amortizações antecipadas ou buscar aumentar o lucro operacional para reduzir essa proporção.`,icr:`A cobertura de juros (${fraca.fmt}) está abaixo do ideal — o lucro operacional mal cobre os juros. Busque renegociar taxas menores ou aumente a rentabilidade da operação.`,dscr:`A cobertura do serviço da dívida (${fraca.fmt}) é o maior limitador. Aumente a margem operacional ou negocie prazos mais longos para reduzir o valor das parcelas anuais.`,ncg_receita:`O capital preso no ciclo operacional (${fraca.fmt} da receita) está alto e reduz o caixa disponível. Renegocie prazos de pagamento com fornecedores e encurte o prazo de recebimento dos clientes.`,cfads_receita:`O caixa livre para dívida (${fraca.fmt} da receita) é baixo. Priorize aumentar a margem operacional ou reduzir gastos com manutenção e investimentos recorrentes.`};
 recs.push(mRec[fraca.id]);
-if(faixa==="verde"||faixa==="amarelo"){recs.push(td?"Aproveite a posição para renegociar spreads.":"Para primeira operação, prefira SAC com prazo 3-5 anos.");recs.push("Monitore D/EBITDA e DSCR trimestralmente.");}
-else if(faixa==="laranja"){recs.push("Se optar por crédito, prefira linhas com carência de amortização (6-12 meses).");recs.push("Considere instrumentos de capital de giro (desconto de recebíveis, FIDC).");}
-else{if(td){recs.push("Priorize renegociação de prazos com credores atuais.");recs.push("Avalie conversão de dívida em equity.");}else recs.push("Foque em margem EBITDA antes de buscar crédito.");}
+if(faixa==="verde"||faixa==="amarelo"){recs.push(td?"Aproveite a posição saudável para renegociar taxas e condições com seus credores — empresas com bons indicadores conseguem spreads (margens sobre o CDI) menores.":"Para a primeira operação de crédito, prefira o sistema SAC (parcelas decrescentes) com prazo de 3 a 5 anos — é o formato mais eficiente para quem está começando a usar dívida.");recs.push("Acompanhe trimestralmente a relação dívida/lucro operacional e a cobertura do serviço da dívida. São os dois indicadores que bancos mais observam.");}
+else if(faixa==="laranja"){recs.push("Se decidir captar crédito, prefira linhas que ofereçam carência de amortização (6–12 meses sem pagar principal), dando tempo para a operação gerar mais caixa.");recs.push("Considere instrumentos de capital de giro, como desconto de recebíveis ou fundos de direitos creditórios (FIDC), que não aumentam a dívida financeira no balanço.");}
+else{if(td){recs.push("Priorize renegociar prazos e condições com os credores atuais antes de buscar novas captações.");recs.push("Avalie a possibilidade de converter parte da dívida em participação societária (equity), reduzindo o peso das parcelas sobre o caixa.");}else recs.push("O foco agora deve ser aumentar a margem operacional (diferença entre receita e custos), gerando mais caixa livre antes de pensar em crédito.");}
 
 return{score,faixa,faixaL,sp,pen,penR,ms,fraca,cens,cons,base:cens[1],otm,res,headline:hl[faixa][td?"com":"sem"],cta:ctas[faixa],ins,recs,ebitda,ncg,cfads,td,inputs:{receita,margem,ciclo,setor,divida:rDiv,taxa:rTaxa,capex:rCapex}};
 }
@@ -221,7 +249,7 @@ return e("div",{style:{width:"100%"}},
       e(AnimNum,{value:score,format:v=>`${Math.round(v)}/100`,duration:1200}))),
   e("div",{style:{position:"relative",height:12,borderRadius:6,background:"#E5E7EB",overflow:"hidden"},role:"progressbar","aria-valuenow":score,"aria-valuemin":0,"aria-valuemax":100,"aria-label":`Score de saúde financeira: ${score} de 100, classificação ${faixa}`},
     e("div",{style:{height:"100%",borderRadius:6,background:col,width:`${w}%`,transition:"width 1.2s cubic-bezier(0.25,0.46,0.45,0.94)"}})),
-  e("div",{style:{display:"flex",justifyContent:"space-between",marginTop:6,fontSize:11,color:"#9CA3AF",flexWrap:"wrap",gap:2}},
+  e("div",{className:"score-labels",style:{display:"flex",justifyContent:"space-between",marginTop:6,fontSize:11,color:"#9CA3AF",flexWrap:"wrap",gap:2}},
     e("span",null,"0 — Restrito"),e("span",null,"40 — Atenção"),e("span",null,"60 — Moderado"),e("span",null,"80 — Saudável"),e("span",null,"100")));}
 
 // ═══════════════════════════════════════════════════════════════════
@@ -231,21 +259,32 @@ function DebtRangeBar({cons,base,otm}){
 const mx=otm*1.15||1;
 const[anim,setAnim]=useState(false);
 useEffect(()=>{const t=setTimeout(()=>setAnim(true),200);return()=>clearTimeout(t);},[]);
-const pos=v=>`${Math.max(0,(v/mx)*100)}%`;
-const markers=[{v:cons,l:"Conservador",c:"#059669"},{v:base,l:"Base",c:"#2563EB"},{v:otm,l:"Otimista",c:"#7C3AED"}];
+const pct=v=>Math.max(0,(v/mx)*100);
+const pos=v=>`${pct(v)}%`;
 
-return e("div",{style:{position:"relative",padding:"36px 0 8px"}},
+// Overlap detection: if two markers are within 12% of each other, offset vertically
+const markers=[{v:cons,l:"Conservador",c:"#059669"},{v:base,l:"Base",c:"#2563EB"},{v:otm,l:"Otimista",c:"#7C3AED"}];
+const pcts=markers.map(m=>pct(m.v));
+const offsets=[0,0,0];
+// Check base vs cons overlap
+if(Math.abs(pcts[1]-pcts[0])<14){offsets[0]=-50;offsets[1]=0;}
+// Check otm vs base overlap
+if(Math.abs(pcts[2]-pcts[1])<14){offsets[2]=offsets[1]===0?-50:0;if(offsets[1]===0)offsets[1]=-25;}
+// Check otm vs cons overlap (rare edge case all 3 close)
+if(Math.abs(pcts[2]-pcts[0])<14){offsets[0]=-55;offsets[1]=-25;offsets[2]=5;}
+
+return e("div",{style:{position:"relative",padding:"52px 0 8px"}},
   e("div",{style:{height:10,borderRadius:5,background:"#E5E7EB",position:"relative"}},
     e("div",{style:{position:"absolute",left:pos(cons),right:`${100-(otm/mx*100)}%`,height:"100%",borderRadius:5,
       background:"linear-gradient(90deg,#059669,#2563EB,#7C3AED)",
       opacity:anim?1:0,transform:anim?"scaleX(1)":"scaleX(0)",transformOrigin:"left",
       transition:"all 0.8s cubic-bezier(0.25,0.46,0.45,0.94)"}}),
     markers.map((p,i)=>e("div",{key:i,style:{position:"absolute",left:pos(p.v),transform:"translateX(-50%)",
-      display:"flex",flexDirection:"column",alignItems:"center",top:-32,
+      display:"flex",flexDirection:"column",alignItems:"center",top:offsets[i]-32,
       opacity:anim?1:0,transition:`opacity 0.4s ease ${.4+i*.2}s`}},
       e("span",{style:{fontSize:13,fontWeight:600,color:p.c,whiteSpace:"nowrap"}},fM(p.v)),
-      e("div",{style:{width:2,height:16,background:p.c,margin:"4px 0 2px",borderRadius:1}})))),
-  e("div",{style:{display:"flex",justifyContent:"space-between",marginTop:24,fontSize:12,color:"#6B7280"}},
+      e("div",{style:{width:2,height:offsets[i]===0?16:16+Math.abs(offsets[i]),background:p.c,margin:"4px 0 2px",borderRadius:1}})))),
+  e("div",{style:{display:"flex",justifyContent:"space-between",marginTop:24,fontSize:13,color:"#6B7280"}},
     e("span",null,"Conservador"),e("span",null,"Base"),e("span",null,"Otimista")));}
 
 // ═══════════════════════════════════════════════════════════════════
@@ -255,14 +294,14 @@ function MetricCard({metric,delay}){
 const c=BC[metric.b];
 const[show,setShow]=useState(false);
 useEffect(()=>{const t=setTimeout(()=>setShow(true),delay||0);return()=>clearTimeout(t);},[delay]);
-return e("div",{style:{background:"#fff",border:`1px solid ${c.bd}`,borderRadius:8,padding:"16px 18px",
+return e("div",{style:{background:"#fff",border:`1px solid ${c.bd}`,borderRadius:10,padding:"20px 24px",
   opacity:show?1:0,transform:show?"translateY(0)":"translateY(12px)",transition:"all 0.4s cubic-bezier(0.16,1,0.3,1)"}},
-  e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
-    e("span",{style:{fontSize:13,color:"#4B5563",fontWeight:500}},MN[metric.id]?.n||metric.id),
-    e("span",{style:{width:24,height:24,borderRadius:12,background:c.bg,border:`1.5px solid ${c.m}`,
-      display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:c.m}},c.ic)),
-  e("div",{style:{fontSize:22,fontWeight:700,color:c.m,marginBottom:6}},metric.fmt),
-  e("div",{style:{fontSize:12,color:"#6B7280",lineHeight:"1.5"}},metric.ref));}
+  e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10,gap:12}},
+    e("span",{style:{fontSize:14,color:"#4B5563",fontWeight:500,lineHeight:"1.4"}},MN[metric.id]?.n||metric.id),
+    e("span",{style:{width:26,height:26,borderRadius:13,background:c.bg,border:`1.5px solid ${c.m}`,
+      display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:c.m,flexShrink:0}},c.ic)),
+  e("div",{style:{fontSize:24,fontWeight:700,color:c.m,marginBottom:8}},metric.fmt),
+  e("div",{style:{fontSize:14,color:"#4B5563",lineHeight:"1.65"}},metric.ref));}
 
 // ═══════════════════════════════════════════════════════════════════
 // INPUT FIELD
@@ -277,7 +316,7 @@ return e("div",{style:{marginBottom:20}},
     help&&e("button",{type:"button",onClick:()=>setShowH(!showH),"aria-label":`Ajuda para ${label}`,
       style:{width:18,height:18,borderRadius:9,border:"1.5px solid #9CA3AF",background:"none",
         fontSize:11,color:"#9CA3AF",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:600,padding:0}},"i")),
-  showH&&e("div",{style:{fontSize:13,color:"#6B7280",background:"#F9FAFB",border:"1px solid #E5E7EB",borderRadius:6,padding:"10px 12px",marginBottom:8,lineHeight:"1.6",animation:"fadeSlideUp .2s ease"}},help),
+  showH&&e("div",{style:{fontSize:14,color:"#4B5563",background:"#F9FAFB",border:"1px solid #E5E7EB",borderRadius:8,padding:"12px 14px",marginBottom:8,lineHeight:"1.65",animation:"fadeSlideUp .2s ease"}},help),
   e("div",{style:{position:"relative"}},
     e("input",{id,type:"text",inputMode:inputMode||"text",placeholder,value,
       onChange:ev=>onChange(ev.target.value),
@@ -288,7 +327,7 @@ return e("div",{style:{marginBottom:20}},
         boxSizing:"border-box",background:"#fff",transition:"border-color 150ms ease,box-shadow 150ms ease",
         boxShadow:foc?"0 0 0 3px rgba(59,130,246,.1)":"none"}}),
     suffix&&e("span",{style:{position:"absolute",right:14,top:"50%",transform:"translateY(-50%)",fontSize:14,color:"#9CA3AF"}},suffix)),
-  hasErr&&e("div",{id:id+"-err",role:"alert",style:{fontSize:13,color:"#DC2626",marginTop:6,display:"flex",alignItems:"center",gap:4}},e("span",{style:{fontSize:14}},"⚠")," ",error),
+  hasErr&&e("div",{id:id+"-err",role:"alert",style:{fontSize:13,color:"#DC2626",marginTop:6,display:"flex",alignItems:"center",gap:4}},e("svg",{width:14,height:14,viewBox:"0 0 24 24",fill:"none",stroke:"#DC2626",strokeWidth:2,strokeLinecap:"round",strokeLinejoin:"round"},e("path",{d:"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"}),e("line",{x1:12,y1:9,x2:12,y2:13}),e("line",{x1:12,y1:17,x2:12.01,y2:17}))," ",error),
   warning&&!error&&e("div",{id:id+"-wrn",style:{fontSize:13,color:"#D97706",marginTop:6}},warning));}
 
 function SelectField({label,value,onChange,options,id,placeholder}){
@@ -349,31 +388,34 @@ const ss=f=>shk===f?{animation:"shake .4s ease"}:{};
 
 return e("form",{onSubmit:submit,noValidate:true},
   e("div",{style:{textAlign:"center",marginBottom:28}},
-    e("h2",{style:{fontSize:22,fontWeight:700,color:"#111827",margin:"0 0 6px"}},"Calculadora de capacidade de endividamento"),
-    e("p",{style:{fontSize:15,color:"#6B7280",margin:0}},"Preencha os dados abaixo para ver sua faixa segura de dívida.")),
+    e("h2",{style:{fontSize:22,fontWeight:700,color:"#111827",margin:"0 0 8px"}},"Calculadora de capacidade de endividamento"),
+    e("p",{style:{fontSize:15,color:"#6B7280",margin:0,lineHeight:"1.5"}},"Preencha os dados abaixo para ver sua faixa segura de dívida.")),
 
-  e("div",{style:ss("rec")},e(InputField,{id:"i-rec",label:"Receita anual bruta (R$)",placeholder:"Ex: 30.000.000",value:rec,onChange:setRec,inputMode:"numeric",required:true,error:tch.rec&&errs.rec,onBlur:()=>setTch(t=>({...t,rec:true})),help:"Faturamento bruto nos últimos 12 meses. Se menos de 12 meses, use receita mensal × 12."})),
-  e("div",{style:ss("mar")},e(InputField,{id:"i-mar",label:"Margem EBITDA (%)",placeholder:"Ex: 15",suffix:"%",value:mar,onChange:setMar,inputMode:"decimal",required:true,error:tch.mar&&errs.mar,warning:wrn.mar,onBlur:()=>setTch(t=>({...t,mar:true})),help:"EBITDA ÷ Receita. Referências: Tecnologia 20-35%, Serviços 12-22%, Indústria 8-18%, Comércio 4-10%."})),
-  e("div",{style:ss("cic")},e(InputField,{id:"i-cic",label:"Ciclo de caixa (dias)",placeholder:"Ex: 75",suffix:"dias",value:cic,onChange:setCic,inputMode:"numeric",required:true,error:tch.cic&&errs.cic,warning:wrn.cic,onBlur:()=>setTch(t=>({...t,cic:true})),help:"Tempo que o dinheiro fica 'preso': PMR + PME − PMP. Referências: Tech 30-50, Serviços 30-60, Indústria 60-120, Comércio 20-50 dias."})),
+  e("div",{style:ss("rec")},e(InputField,{id:"i-rec",label:"Receita anual bruta (R$)",placeholder:"Ex: 30.000.000",value:rec,onChange:setRec,inputMode:"numeric",required:true,error:tch.rec&&errs.rec,onBlur:()=>setTch(t=>({...t,rec:true})),help:"O faturamento total bruto da empresa nos últimos 12 meses (antes de descontar impostos sobre vendas). Se a empresa tem menos de 12 meses, multiplique a receita mensal média por 12."})),
+  e("div",{style:ss("mar")},e(InputField,{id:"i-mar",label:"Margem EBITDA (%)",placeholder:"Ex: 15",suffix:"%",value:mar,onChange:setMar,inputMode:"decimal",required:true,error:tch.mar&&errs.mar,warning:wrn.mar,onBlur:()=>setTch(t=>({...t,mar:true})),help:"O EBITDA é o lucro operacional antes de juros, impostos, depreciação e amortização — ou seja, quanto a operação gera de lucro por si mesma. A margem EBITDA é esse valor dividido pela receita, em percentual. Referências por setor: Tecnologia 20–35%, Serviços 12–22%, Indústria 8–18%, Comércio 4–10%."})),
+  e("div",{style:ss("cic")},e(InputField,{id:"i-cic",label:"Ciclo de caixa (dias)",placeholder:"Ex: 75",suffix:"dias",value:cic,onChange:setCic,inputMode:"numeric",required:true,error:tch.cic&&errs.cic,warning:wrn.cic,onBlur:()=>setTch(t=>({...t,cic:true})),help:"O ciclo de caixa mede quantos dias o dinheiro fica 'preso' na operação. Cálculo: prazo médio de recebimento (PMR) + prazo médio de estoque (PME) − prazo médio de pagamento a fornecedores (PMP). Quanto maior, mais capital de giro a empresa precisa. Referências: Tecnologia 30–50 dias, Serviços 30–60, Indústria 60–120, Comércio 20–50."})),
 
   // Accordion
-  e("div",{style:{borderTop:"1px solid #E5E7EB",paddingTop:16,marginTop:4}},
+  e("div",{style:{borderTop:"1px solid #E5E7EB",paddingTop:20,marginTop:8}},
     e("button",{type:"button",onClick:()=>setOptO(!optO),"aria-expanded":optO,
-      style:{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:8,padding:0,fontSize:14,color:"#2563EB",fontWeight:500}},
-      e("span",{style:{transform:optO?"rotate(90deg)":"rotate(0deg)",transition:"transform 200ms ease",display:"inline-block"}},"▸"),
-      optO?"Campos opcionais — quanto mais dados, mais preciso":"Refinar meu resultado (opcional)"),
+      style:{background:optO?"#F0F4FF":"#F9FAFB",border:"1px solid "+(optO?"#BFDBFE":"#E5E7EB"),borderRadius:8,cursor:"pointer",
+        display:"flex",alignItems:"center",gap:10,padding:"12px 16px",fontSize:14,color:optO?"#1D4ED8":"#4B5563",fontWeight:500,width:"100%",transition:"all 200ms ease"}},
+      e("svg",{width:16,height:16,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:2,strokeLinecap:"round",strokeLinejoin:"round",
+        style:{transform:optO?"rotate(180deg)":"rotate(0deg)",transition:"transform 200ms ease",flexShrink:0}},
+        e("polyline",{points:"6 9 12 15 18 9"})),
+      e("span",null,optO?"Campos opcionais — quanto mais dados, mais preciso":"Refinar meu resultado (opcional)")),
     e("div",{style:{maxHeight:optO?600:0,overflow:"hidden",transition:"max-height .35s cubic-bezier(0.16,1,0.3,1),opacity .25s ease",opacity:optO?1:0,marginTop:optO?16:0}},
       e(SelectField,{id:"i-set",label:"Setor de atuação",value:set,onChange:setSet,placeholder:"Selecione seu setor",options:SETORES_LIST.map(s=>({v:s.id,l:s.nome}))}),
-      e(InputField,{id:"i-div",label:"Dívida bruta atual (R$)",placeholder:"Ex: 5.000.000",value:div,onChange:setDiv,inputMode:"numeric",help:"Soma de empréstimos, financiamentos, debêntures (curto e longo prazo)."}),
-      e(InputField,{id:"i-tax",label:"Taxa de juros média (% a.a.)",placeholder:"Ex: 14.25",suffix:"% a.a.",value:tax,onChange:setTax,inputMode:"decimal",help:"Custo médio ponderado da dívida. Default: CDI + 3% (14,25%)."}),
-      e(InputField,{id:"i-cap",label:"Investimento anual de manutenção (R$)",placeholder:"Ex: 900.000",value:cap,onChange:setCap,inputMode:"numeric",help:"Investimento para manter a operação (não crescimento). Default: média do setor."}))),
+      e(InputField,{id:"i-div",label:"Dívida bruta atual (R$)",placeholder:"Ex: 5.000.000",value:div,onChange:setDiv,inputMode:"numeric",help:"A soma de todos os empréstimos bancários, financiamentos, debêntures e outras dívidas financeiras (de curto e longo prazo). Não inclua contas a pagar do dia a dia (fornecedores, salários, impostos)."}),
+      e(InputField,{id:"i-tax",label:"Taxa de juros média (% a.a.)",placeholder:"Ex: 14.25",suffix:"% a.a.",value:tax,onChange:setTax,inputMode:"decimal",help:"A taxa de juros média de todas as suas dívidas, ponderada pelo valor de cada uma. Se não souber, a calculadora usará como padrão CDI + 3% ao ano (14,25%), que é uma referência de mercado para empresas de médio porte."}),
+      e(InputField,{id:"i-cap",label:"Investimento anual de manutenção (R$)",placeholder:"Ex: 900.000",value:cap,onChange:setCap,inputMode:"numeric",help:"Quanto a empresa gasta por ano para manter máquinas, equipamentos e infraestrutura funcionando (não inclui investimentos para crescimento). Se não souber, a calculadora usará a média do setor, que varia de 2% a 7,5% da receita."}))),
 
   e("button",{type:"submit",disabled:!canS,
-    style:{width:"100%",height:52,borderRadius:8,border:"none",background:canS?"#2563EB":"#D1D5DB",
-      color:canS?"#fff":"#9CA3AF",fontSize:16,fontWeight:600,cursor:canS?"pointer":"not-allowed",
-      marginTop:24,transition:"all 150ms ease"},
-    onMouseEnter:ev=>{if(canS)ev.target.style.background="#1D4ED8";},
-    onMouseLeave:ev=>{if(canS)ev.target.style.background="#2563EB";}},
+    style:{width:"100%",height:56,borderRadius:10,border:"none",background:canS?"linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%)":"#D1D5DB",
+      color:canS?"#fff":"#9CA3AF",fontSize:16,fontWeight:700,cursor:canS?"pointer":"not-allowed",
+      marginTop:28,transition:"all 200ms ease",boxShadow:canS?"0 2px 8px rgba(37,99,235,.25)":"none"},
+    onMouseEnter:ev=>{if(canS){ev.target.style.transform="translateY(-1px)";ev.target.style.boxShadow="0 4px 16px rgba(37,99,235,.35)";}},
+    onMouseLeave:ev=>{if(canS){ev.target.style.transform="none";ev.target.style.boxShadow="0 2px 8px rgba(37,99,235,.25)";}}},
     canS?"Ver meu resultado":"Preencha os 3 campos acima para continuar"));}
 
 // ═══════════════════════════════════════════════════════════════════
@@ -381,7 +423,7 @@ return e("form",{onSubmit:submit,noValidate:true},
 // ═══════════════════════════════════════════════════════════════════
 function Screen2(){
 const[step,setStep]=useState(0);
-const steps=["Calculando EBITDA e fluxo de caixa disponível","Aplicando cenários de stress","Gerando seu diagnóstico"];
+const steps=["Calculando lucro operacional e caixa disponível para dívida","Simulando cenários de stress (conservador, base e otimista)","Gerando seu diagnóstico com recomendações personalizadas"];
 useEffect(()=>{const t1=setTimeout(()=>setStep(1),500),t2=setTimeout(()=>setStep(2),1000);return()=>{clearTimeout(t1);clearTimeout(t2);};},[]);
 return e("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:280,gap:24}},
   e("div",{style:{width:48,height:48}},
@@ -397,59 +439,61 @@ return e("div",{style:{display:"flex",flexDirection:"column",alignItems:"center"
 // ═══════════════════════════════════════════════════════════════════
 function Screen3({r,onRecalc,onCapture}){
 const c=BC[r.faixa];
-const valueBullets=["Análise completa da sua estrutura de capital","Cenários com taxas e prazos reais de mercado","Recomendações de instrumento (FIDC, debênture, NC)","Conversa com especialista DeFin — sem compromisso"];
+const valueBullets=["Análise completa da sua estrutura de capital e capacidade de endividamento","Simulação com taxas e prazos reais de mercado para seu perfil","Recomendações de instrumento de crédito (fundos, debêntures, notas comerciais)","Conversa individual com especialista DeFin — sem compromisso"];
 return e("div",null,
   // Block 1: Headline + Score
   e(FadeIn,{delay:0},
     e("div",{style:{textAlign:"center",marginBottom:28}},
       e("div",{style:{display:"inline-block",padding:"4px 14px",borderRadius:20,background:c.bg,border:`1px solid ${c.bd}`,fontSize:13,fontWeight:600,color:c.m,marginBottom:12}},c.ic," ",r.faixaL),
-      e("h2",{style:{fontSize:22,fontWeight:700,color:"#111827",margin:"0 0 6px",lineHeight:"1.35"}},r.headline),
+      e("h2",{style:{fontSize:24,fontWeight:700,color:"#111827",margin:"0 0 8px",lineHeight:"1.35"}},r.headline),
       r.penR&&e("div",{style:{fontSize:12,color:"#D97706",background:"#FFFBEB",padding:"6px 12px",borderRadius:6,marginTop:8}},r.penR)),
     e(ScoreGauge,{score:r.score,faixa:r.faixa})),
 
   // Block 2: Debt range
-  e(FadeIn,{delay:200,style:{marginTop:32}},
-    e("div",{style:{background:"#F9FAFB",borderRadius:10,padding:"20px 22px",border:"1px solid #E5E7EB"}},
-      e("h3",{style:{fontSize:16,fontWeight:600,color:"#111827",margin:"0 0 4px"}},"Faixa segura de endividamento"),
+  e(FadeIn,{delay:200,style:{marginTop:40}},
+    e("div",{style:{background:"#F9FAFB",borderRadius:12,padding:"24px 26px",border:"1px solid #E5E7EB"}},
+      e("h3",{style:{fontSize:18,fontWeight:700,color:"#111827",margin:"0 0 6px"}},"Faixa segura de endividamento"),
       e(DebtRangeBar,{cons:r.cons.cap,base:r.base.cap,otm:r.otm.cap}),
-      e("p",{style:{fontSize:14,color:"#4B5563",lineHeight:"1.6",margin:"16px 0 0"}},
+      e("p",{style:{fontSize:15,color:"#4B5563",lineHeight:"1.65",margin:"16px 0 0"}},
         r.base.cap===0?"A geração de caixa atual não suporta endividamento no cenário base."
         :r.cons.cap>0?[`Sua empresa pode sustentar entre `,e("strong",{key:"a"},fM(r.cons.cap))," e ",e("strong",{key:"b"},fM(r.otm.cap)),` em dívida total, equivalente a `,e("strong",{key:"c"},`${fX(r.cons.mEq)}–${fX(r.otm.mEq)}`)," o EBITDA."]
         :[`No cenário base, sua empresa suportaria até `,e("strong",{key:"d"},fM(r.base.cap)),` (${fX(r.base.mEq)} EBITDA). Sob stress, a capacidade cairia para zero.`]),
-      r.res&&e("div",{style:{marginTop:12,padding:"10px 14px",background:"#fff",borderRadius:6,border:"1px solid #E5E7EB",fontSize:13,color:"#4B5563",lineHeight:"1.5"}},
+      r.res&&e("div",{style:{marginTop:14,padding:"12px 16px",background:"#fff",borderRadius:8,border:"1px solid #E5E7EB",fontSize:14,color:"#4B5563",lineHeight:"1.6"}},
         e("strong",{style:{color:"#111827"}},"Capacidade residual: "),
         r.res.base>0?["Folga de ",e("strong",{key:"r"},fM(r.res.base))," no cenário base."]:["Excede a capacidade em ",e("strong",{key:"r"},fM(Math.abs(r.res.base))),"."]))),
 
   // Block 3: Metrics
-  e(FadeIn,{delay:400,style:{marginTop:28}},
-    e("h3",{style:{fontSize:16,fontWeight:600,color:"#111827",margin:"0 0 14px"}},"Suas métricas em detalhe"),
-    e("div",{className:"metrics-grid",style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:12}},
+  e(FadeIn,{delay:400,style:{marginTop:40}},
+    e("h3",{style:{fontSize:18,fontWeight:700,color:"#111827",margin:"0 0 16px"}},"Suas métricas em detalhe"),
+    e("div",{className:"metrics-grid",style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:14}},
       r.ms.map((m,i)=>e(MetricCard,{key:m.id,metric:m,delay:450+i*100})))),
 
   // Block 4: Insight + Recs
-  e(FadeIn,{delay:700,style:{marginTop:28}},
-    e("div",{style:{background:"#EFF6FF",borderRadius:10,padding:"20px 22px",border:"1px solid #BFDBFE"}},
-      e("h3",{style:{fontSize:16,fontWeight:600,color:"#1E40AF",margin:"0 0 6px"}},r.ins.t),
-      e("p",{style:{fontSize:14,color:"#1E3A5F",margin:"0 0 10px",lineHeight:"1.5"}},r.ins.tx),
-      r.ins.a&&e("div",{style:{fontSize:14,color:"#1D4ED8",fontWeight:500,background:"#fff",padding:"10px 14px",borderRadius:6,lineHeight:"1.5"}},"💡 ",r.ins.a)),
-    e("div",{style:{marginTop:20}},
-      e("h4",{style:{fontSize:15,fontWeight:600,color:"#111827",margin:"0 0 10px"}},"Próximos passos recomendados"),
-      e("div",{style:{display:"flex",flexDirection:"column",gap:8}},
-        r.recs.map((rc,i)=>e("div",{key:i,style:{display:"flex",gap:10,fontSize:14,color:"#374151",lineHeight:"1.5"}},
+  e(FadeIn,{delay:700,style:{marginTop:40}},
+    e("div",{style:{background:"#EFF6FF",borderRadius:12,padding:"24px 26px",border:"1px solid #BFDBFE"}},
+      e("h3",{style:{fontSize:18,fontWeight:700,color:"#1E40AF",margin:"0 0 8px"}},r.ins.t),
+      e("p",{style:{fontSize:15,color:"#1E3A5F",margin:"0 0 12px",lineHeight:"1.65"}},r.ins.tx),
+      r.ins.a&&e("div",{style:{fontSize:15,color:"#1D4ED8",fontWeight:500,background:"#fff",padding:"12px 16px",borderRadius:8,lineHeight:"1.6",display:"flex",gap:8,alignItems:"flex-start"}},
+        e("svg",{width:20,height:20,viewBox:"0 0 24 24",fill:"none",stroke:"#1D4ED8",strokeWidth:2,strokeLinecap:"round",strokeLinejoin:"round",style:{flexShrink:0,marginTop:2}},e("path",{d:"M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"}),e("line",{x1:9,y1:21,x2:15,y2:21})),
+        e("span",null,r.ins.a))),
+    e("div",{style:{marginTop:24}},
+      e("h4",{style:{fontSize:16,fontWeight:600,color:"#111827",margin:"0 0 12px"}},"Próximos passos recomendados"),
+      e("div",{style:{display:"flex",flexDirection:"column",gap:10}},
+        r.recs.map((rc,i)=>e("div",{key:i,style:{display:"flex",gap:10,fontSize:15,color:"#374151",lineHeight:"1.6"}},
           e("span",{style:{color:"#2563EB",fontWeight:600,flexShrink:0}},`${i+1}.`),e("span",null,rc)))))),
 
   // Block 5: CTA
-  e(FadeIn,{delay:900,style:{marginTop:28}},
-    e("div",{style:{background:"linear-gradient(135deg,#1E3A5F 0%,#1E40AF 100%)",borderRadius:12,padding:"28px 24px",color:"#fff",textAlign:"center"}},
-      e("div",{style:{fontSize:11,textTransform:"uppercase",letterSpacing:1.5,opacity:.7,marginBottom:8}},"Resultado personalizado?"),
-      e("p",{style:{fontSize:15,lineHeight:"1.6",margin:"0 0 16px",opacity:.9}},r.cta.x),
+  e(FadeIn,{delay:900,style:{marginTop:40}},
+    e("div",{style:{background:"linear-gradient(135deg,#0F172A 0%,#1E3A5F 50%,#1E40AF 100%)",borderRadius:14,padding:"32px 28px",color:"#fff",textAlign:"center"}},
+      e("div",{style:{fontSize:11,textTransform:"uppercase",letterSpacing:1.5,opacity:.6,marginBottom:10}},"Quer ir mais fundo?"),
+      e("p",{style:{fontSize:16,lineHeight:"1.65",margin:"0 0 20px",opacity:.92}},r.cta.x),
       e("div",{style:{display:"flex",flexDirection:"column",alignItems:"flex-start",gap:6,marginBottom:20,fontSize:14,textAlign:"left",maxWidth:360,margin:"0 auto 20px"}},
         valueBullets.map((b,i)=>e("div",{key:i,style:{display:"flex",alignItems:"flex-start",gap:8}},
           e("span",{style:{color:"#60A5FA",flexShrink:0}},"✓"),e("span",{style:{opacity:.92}},b)))),
       e("button",{onClick:onCapture,
-        style:{height:48,borderRadius:8,border:"none",background:"#fff",color:"#1E40AF",fontSize:16,fontWeight:600,cursor:"pointer",padding:"0 32px",transition:"transform 150ms ease,box-shadow 150ms ease"},
-        onMouseEnter:ev=>{ev.target.style.transform="translateY(-1px)";ev.target.style.boxShadow="0 4px 14px rgba(0,0,0,.15)";},
-        onMouseLeave:ev=>{ev.target.style.transform="none";ev.target.style.boxShadow="none";}},r.cta.t))),
+        style:{height:52,borderRadius:10,border:"none",background:"#fff",color:"#1E40AF",fontSize:16,fontWeight:700,cursor:"pointer",padding:"0 36px",transition:"transform 150ms ease,box-shadow 150ms ease",boxShadow:"0 2px 8px rgba(0,0,0,.1)"},
+        onMouseEnter:ev=>{ev.target.style.transform="translateY(-2px)";ev.target.style.boxShadow="0 6px 20px rgba(0,0,0,.2)";},
+        onMouseLeave:ev=>{ev.target.style.transform="none";ev.target.style.boxShadow="0 2px 8px rgba(0,0,0,.1)";}},r.cta.t))),
 
   // Recalculate
   e("div",{style:{textAlign:"center",marginTop:20}},
@@ -476,7 +520,7 @@ const wrnE=em&&/^[^@]+@(gmail|hotmail|outlook|yahoo)\./i.test(em)?"Preferimos em
 return e("form",{onSubmit:submit,noValidate:true},
   e("button",{type:"button",onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",color:"#2563EB",fontSize:14,fontWeight:500,padding:0,marginBottom:16,display:"flex",alignItems:"center",gap:4}},"← Voltar ao resultado"),
   e("h2",{style:{fontSize:22,fontWeight:700,color:"#111827",margin:"0 0 6px"}},"Receba seu diagnóstico personalizado"),
-  e("p",{style:{fontSize:15,color:"#6B7280",margin:"0 0 24px"}},"Preencha seus dados e um especialista DeFin entrará em contato em até 24h."),
+  e("p",{style:{fontSize:15,color:"#6B7280",margin:"0 0 24px"}},"Preencha seus dados abaixo. Um especialista da DeFin vai analisar seu resultado e entrar em contato em até 24 horas com um diagnóstico completo e personalizado."),
   e(InputField,{id:"c-em",label:"Email corporativo",placeholder:"nome@empresa.com.br",value:em,onChange:setEm,error:errs.em,warning:wrnE,required:true}),
   e(InputField,{id:"c-nm",label:"Seu nome",placeholder:"João da Silva",value:nm,onChange:setNm,error:errs.nm,required:true}),
   e(InputField,{id:"c-emp",label:"Nome da empresa",placeholder:"Empresa S.A.",value:emp,onChange:setEmp,error:errs.emp,required:true}),
@@ -485,7 +529,9 @@ return e("form",{onSubmit:submit,noValidate:true},
   e("label",{style:{display:"flex",gap:10,alignItems:"flex-start",margin:"16px 0",cursor:"pointer"}},
     e("input",{type:"checkbox",checked:con,onChange:ev=>setCon(ev.target.checked),style:{marginTop:3,accentColor:"#2563EB",width:16,height:16}}),
     e("span",{style:{fontSize:13,color:"#4B5563",lineHeight:"1.5"}},"Concordo em receber comunicações da DeFin sobre meu diagnóstico e conteúdos relacionados. Posso cancelar a qualquer momento.")),
-  errs.con&&e("div",{style:{fontSize:13,color:"#DC2626",marginBottom:12}},"⚠ ",errs.con),
+  errs.con&&e("div",{style:{fontSize:13,color:"#DC2626",marginBottom:12,display:"flex",alignItems:"center",gap:4}},
+    e("svg",{width:14,height:14,viewBox:"0 0 24 24",fill:"none",stroke:"#DC2626",strokeWidth:2,strokeLinecap:"round",strokeLinejoin:"round"},e("path",{d:"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"}),e("line",{x1:12,y1:9,x2:12,y2:13}),e("line",{x1:12,y1:17,x2:12.01,y2:17})),
+    " ",errs.con),
   e("button",{type:"submit",style:{width:"100%",height:52,borderRadius:8,border:"none",background:"#2563EB",color:"#fff",fontSize:16,fontWeight:600,cursor:"pointer",marginTop:8,transition:"background 150ms ease"},
     onMouseEnter:ev=>ev.target.style.background="#1D4ED8",onMouseLeave:ev=>ev.target.style.background="#2563EB"},"Enviar e agendar diagnóstico"),
   e("p",{style:{fontSize:12,color:"#9CA3AF",textAlign:"center",marginTop:10}},"Seus dados estão seguros. ",e("a",{href:"#"},"Política de privacidade"),".")
@@ -497,25 +543,36 @@ return e("form",{onSubmit:submit,noValidate:true},
 function Screen5({email}){
 const[show,setShow]=useState(false);
 useEffect(()=>{const t=setTimeout(()=>setShow(true),200);return()=>clearTimeout(t);},[]);
-const links=[{i:"📄",t:"Quanto é seguro se endividar? Guia prático para empresas em crescimento",s:"Artigo no blog"},
-{i:"📊",t:"5 Mitos sobre Endividamento — série no LinkedIn",s:"Carrossel LinkedIn"},
-{i:"📥",t:"Baixar meu resultado em PDF",s:"Download direto"}];
+const IC=t=>{const p={article:"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8",chart:"M18 20V10 M12 20V4 M6 20v-6",download:"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5 M12 15V3"};
+  return e("svg",{width:20,height:20,viewBox:"0 0 24 24",fill:"none",stroke:"#2563EB",strokeWidth:2,strokeLinecap:"round",strokeLinejoin:"round",style:{flexShrink:0,marginTop:2}},
+    (p[t]||"").split(" M").map((d,i)=>e("path",{key:i,d:i===0?d:"M"+d})));};
+const links=[{i:"article",t:"Qual o nível seguro de endividamento? Guia prático para empresas em crescimento",s:"Artigo no blog"},
+{i:"chart",t:"5 Mitos sobre Endividamento — série no LinkedIn",s:"Carrossel LinkedIn"},
+{i:"download",t:"Baixar meu resultado em PDF",s:"Download direto"}];
 
 return e("div",{style:{textAlign:"center",padding:"20px 0"}},
   e("div",{style:{width:64,height:64,borderRadius:32,background:"#ECFDF5",border:"2px solid #059669",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 20px",
     transform:show?"scale(1)":"scale(0.5)",opacity:show?1:0,transition:"all .5s cubic-bezier(0.16,1,0.3,1)"}},
     e("span",{style:{fontSize:28,color:"#059669"}},"✓")),
   e("h2",{style:{fontSize:22,fontWeight:700,color:"#111827",margin:"0 0 10px"}},"Diagnóstico agendado!"),
-  e("p",{style:{fontSize:15,color:"#4B5563",lineHeight:"1.6",margin:"0 0 28px"}},"Enviamos um email para ",e("strong",null,email)," com o resumo do seu resultado. Um especialista DeFin entrará em contato em até 24h."),
+  e("p",{style:{fontSize:15,color:"#4B5563",lineHeight:"1.6",margin:"0 0 28px"}},"Enviamos um email para ",e("strong",null,email)," com o resumo completo do seu resultado. Um especialista da DeFin vai analisar seus indicadores e entrar em contato em até 24 horas para discutir as melhores opções para a sua empresa."),
   e("div",{style:{textAlign:"left",background:"#F9FAFB",borderRadius:10,padding:"20px 22px",border:"1px solid #E5E7EB"}},
     e("p",{style:{fontSize:14,fontWeight:600,color:"#111827",margin:"0 0 14px"}},"Enquanto isso, aprofunde-se:"),
     links.map((l,i)=>e("a",{key:i,href:"#",style:{display:"flex",alignItems:"flex-start",gap:12,padding:"12px 0",borderTop:i>0?"1px solid #E5E7EB":"none",textDecoration:"none",color:"inherit"}},
-      e("span",{style:{fontSize:20,flexShrink:0}},l.i),
+      IC(l.i),
       e("div",null,e("div",{style:{fontSize:14,fontWeight:500,color:"#2563EB"}},l.t),e("div",{style:{fontSize:12,color:"#9CA3AF"}},l.s))))));}
 
 // ═══════════════════════════════════════════════════════════════════
 // MAIN APP
 // ═══════════════════════════════════════════════════════════════════
+// Step indicator component
+function StepIndicator({current}){
+const steps=[{k:"inputs",l:"Dados"},{k:"results",l:"Resultado"},{k:"capture",l:"Contato"}];
+const idx=current==="processing"?0:current==="confirm"?2:steps.findIndex(s=>s.k===current);
+return e("div",{className:"step-indicator","aria-label":"Progresso"},
+  steps.map((s,i)=>e("div",{key:s.k,className:`step-dot${i===idx?" step-dot--active":""}${i<idx?" step-dot--done":""}`,
+    "aria-label":`${s.l}${i===idx?" (atual)":i<idx?" (concluído)":""}`,title:s.l})));}
+
 function App(){
 const[scr,setScr]=useState("inputs");
 const[result,setResult]=useState(null);
@@ -527,25 +584,44 @@ const doCalc=vals=>{setSaved(vals.saved);setScr("processing");
 setTimeout(()=>{const r=calc(vals.receita,vals.margem,vals.ciclo,vals.setor,vals.divida,vals.taxa,vals.capex);
 setResult(r);setScr("results");wRef.current&&wRef.current.scrollIntoView({behavior:"smooth",block:"start"});},1800);};
 
+const isResults=scr==="results";
+
 return e("div",{style:{padding:"0 16px"}},
+  // Header
+  e("header",{className:"site-header"},
+    e("a",{href:"https://defin.global","aria-label":"DeFin Global — Ir para o site",style:{display:"flex",alignItems:"center",gap:10,textDecoration:"none"}},
+      e("svg",{viewBox:"0 0 36 36",width:36,height:36,fill:"none",xmlns:"http://www.w3.org/2000/svg","aria-hidden":"true"},
+        e("rect",{width:36,height:36,rx:8,fill:"#0033A0"}),
+        e("text",{x:5,y:26,fontFamily:"'DM Sans',sans-serif",fontSize:22,fontWeight:800,fill:"white"},"DF")),
+      e("span",{style:{fontSize:20,fontWeight:700,color:"#0033A0",letterSpacing:-.3}},"DeFin"))),
+
   // Hero
-  scr==="inputs"&&e("div",{className:"hero",style:{textAlign:"center",maxWidth:560,margin:"0 auto",paddingTop:48,paddingBottom:20}},
-    e("div",{style:{display:"inline-block",padding:"5px 14px",borderRadius:20,background:"rgba(37,99,235,.08)",fontSize:12,fontWeight:600,color:"#2563EB",letterSpacing:.5,marginBottom:16,textTransform:"uppercase"}},"DeFin Global — Ferramenta gratuita"),
-    e("h1",{style:{fontSize:32,fontWeight:800,color:"#0F172A",margin:"0 0 12px",lineHeight:"1.2",letterSpacing:-.5}},"Quanto é seguro sua empresa se endividar?"),
-    e("p",{style:{fontSize:17,color:"#4B5563",margin:"0 0 8px",lineHeight:"1.6"}},"Descubra sua faixa ideal de dívida em 3 minutos — com base em métricas reais de mercado."),
-    e("p",{style:{fontSize:13,color:"#9CA3AF",margin:"0 0 32px"}},"Metodologia baseada em referências de credit analysis institucional (Damodaran/NYU, JPMorgan, OCDE)")),
+  scr==="inputs"&&e("div",{className:"hero",style:{textAlign:"center",maxWidth:580,margin:"0 auto",paddingTop:24,paddingBottom:28}},
+    e("h1",{style:{fontSize:34,fontWeight:800,color:"#0F172A",margin:"0 0 16px",lineHeight:"1.2",letterSpacing:-.5}},"Qual o nível seguro de endividamento da sua empresa?"),
+    e("p",{className:"hero-subtitle",style:{fontSize:17,color:"#4B5563",margin:"0 0 20px",lineHeight:"1.65"}},"Descubra em 3 minutos quanto sua empresa pode tomar de crédito com segurança — usando as mesmas métricas que bancos e fundos analisam antes de emprestar."),
+    e("div",{style:{display:"flex",justifyContent:"center",gap:16,flexWrap:"wrap"}},
+      ["Damodaran/NYU","JPMorgan","OCDE"].map(n=>e("span",{key:n,style:{fontSize:12,fontWeight:500,color:"#6B7280",background:"#F3F4F6",padding:"4px 12px",borderRadius:20,border:"1px solid #E5E7EB"}},n)))),
 
   // Widget
-  e("div",{ref:wRef,className:`widget${scr==="processing"?" widget--processing":""}`,style:scr==="processing"?{padding:"40px 28px"}:undefined},
+  e("div",{ref:wRef,className:`widget${scr==="processing"?" widget--processing":""}${isResults?" widget--results":""}`,style:scr==="processing"?{padding:"40px 32px"}:undefined},
+    // Step indicator (except processing)
+    scr!=="processing"&&e(StepIndicator,{current:scr}),
     scr==="inputs"&&e(Screen1,{onCalc:doCalc,init:saved}),
     scr==="processing"&&e(Screen2,null),
     scr==="results"&&e(Screen3,{r:result,onRecalc:()=>setScr("inputs"),onCapture:()=>{setScr("capture");wRef.current&&wRef.current.scrollIntoView({behavior:"smooth",block:"start"});}}),
     scr==="capture"&&e(Screen4,{onSubmit:d=>{setCapEmail(d.email);setScr("confirm");wRef.current&&wRef.current.scrollIntoView({behavior:"smooth",block:"start"});},onBack:()=>setScr("results")}),
     scr==="confirm"&&e(Screen5,{email:capEmail})),
 
-  // Disclaimer
-  e("div",{style:{maxWidth:640,margin:"0 auto 48px",textAlign:"center"}},
-    e("p",{style:{fontSize:11,color:"#9CA3AF",lineHeight:"1.6"}},"Esta calculadora é uma ferramenta educacional. Os resultados não constituem recomendação de investimento, oferta de crédito ou aconselhamento financeiro. Consulte um assessor qualificado antes de tomar decisões.")));}
+  // Footer
+  e("footer",{style:{maxWidth:760,margin:"0 auto 48px",textAlign:"center",padding:"0 16px"}},
+    e("div",{style:{borderTop:"1px solid #E5E7EB",paddingTop:24,marginTop:8}},
+      e("p",{style:{fontSize:12,color:"#9CA3AF",lineHeight:"1.65",marginBottom:12}},"Esta calculadora é uma ferramenta educacional. Os resultados não constituem recomendação de investimento, oferta de crédito ou aconselhamento financeiro. Consulte um assessor qualificado antes de tomar decisões."),
+      e("div",{style:{display:"flex",justifyContent:"center",gap:16,fontSize:12,color:"#9CA3AF"}},
+        e("a",{href:"https://defin.global",style:{color:"#6B7280"}},"defin.global"),
+        e("span",null,"·"),
+        e("a",{href:"#",style:{color:"#6B7280"}},"Política de privacidade"),
+        e("span",null,"·"),
+        e("a",{href:"#",style:{color:"#6B7280"}},"Termos de uso")))));}
 
 // Mount
 ReactDOM.createRoot(document.getElementById("root")).render(e(App));
