@@ -101,7 +101,7 @@ const SM=Object.fromEntries(SETORES_LIST.map(s=>[s.id,s]));
 const P={TAX:.34,PT:.66,TERM:5,AMORT:.2,RATE:.1425};
 
 // Scoring: [threshold, points, band]. Ordered high→low
-const SC_DE=[[5,0,"vermelho"],[3.5,5,"laranja"],[3,10,"amarelo"],[2,15,"amarelo"],[1,20,"verde"],[0,25,"verde"]];
+const SC_DE=[[3.5,0,"vermelho"],[2.5,10,"laranja"],[1.5,17,"amarelo"],[0,25,"verde"]];
 const SC_ICR=[[6,20,"verde"],[4.5,16,"verde"],[3.5,12,"amarelo"],[2.5,8,"amarelo"],[1.5,4,"laranja"],[0,0,"vermelho"]];
 const SC_DSCR=[[2,25,"verde"],[1.5,20,"verde"],[1.25,15,"amarelo"],[1.1,8,"laranja"],[1,3,"laranja"],[0,0,"vermelho"]];
 const SC_NCG=[[30,0,"vermelho"],[22,4,"laranja"],[15,8,"amarelo"],[8,12,"verde"],[0,15,"verde"]];
@@ -116,7 +116,7 @@ function sft(v,t,inv){
 const MN={d_ebitda:{n:"Alavancagem: dívida sobre lucro operacional",c:"Dívida/EBITDA"},icr:{n:"Cobertura de juros: lucro vs. despesa financeira",c:"ICR"},dscr:{n:"Cobertura do serviço da dívida: caixa vs. parcelas",c:"DSCR"},ncg_receita:{n:"Capital preso no giro: % da receita no ciclo operacional",c:"NCG/Receita"},cfads_receita:{n:"Caixa disponível para dívida: % da receita livre",c:"CFADS/Receita"}};
 
 const MR={
-d_ebitda:{verde:"Abaixo de 2.0x: a dívida é menor que 2 anos de lucro operacional. Confortável para a maioria dos setores e bem vista por bancos.",amarelo:"Entre 2.0x e 3.5x: a dívida equivale a 2–3,5 anos de lucro operacional. Dentro da faixa de mercado, mas exige monitoramento trimestral.",laranja:"Entre 3.5x e 5.0x: a dívida supera 3,5 anos de lucro operacional. Credores costumam exigir garantias adicionais ou spreads maiores.",vermelho:"Acima de 5.0x: a dívida levaria mais de 5 anos de lucro operacional para ser quitada. Risco elevado de não conseguir refinanciar no vencimento."},
+d_ebitda:{verde:"Abaixo de 1,5x: a dívida é menor que 1,5 anos de lucro operacional. Confortável para a maioria dos setores e bem vista por bancos.",amarelo:"Entre 1,5x e 2,5x: a dívida equivale a 1,5–2,5 anos de lucro operacional. Dentro da faixa de mercado, mas exige monitoramento trimestral.",laranja:"Entre 2,5x e 3,5x: a dívida supera 2,5 anos de lucro operacional. Credores costumam exigir garantias adicionais ou spreads maiores.",vermelho:"Acima de 3,5x: a dívida levaria mais de 3,5 anos de lucro operacional para ser quitada. Risco elevado de não conseguir refinanciar no vencimento."},
 icr:{verde:"Acima de 4.5x: o lucro operacional cobre os juros com folga de 4,5 vezes. Perfil equivalente a empresas com classificação de crédito A- ou superior.",amarelo:"Entre 2.5x e 4.5x: o lucro cobre os juros entre 2,5 e 4,5 vezes. Margem suficiente, mas sem grande folga para absorver quedas de receita.",laranja:"Entre 1.5x e 2.5x: o lucro operacional mal supera a despesa de juros. Qualquer queda na receita pode comprometer o pagamento.",vermelho:"Abaixo de 1.5x: zona crítica. O lucro operacional quase não cobre os juros, e qualquer oscilação pode gerar inadimplência."},
 dscr:{verde:"Acima de 1.50x: o caixa livre cobre juros + amortização com folga de 50% ou mais. Posição sólida para tomar crédito.",amarelo:"Entre 1.25x e 1.50x: o caixa cobre a dívida, mas está no limite do que bancos costumam exigir como mínimo em contratos (covenant de 1,25x).",laranja:"Entre 1.05x e 1.25x: o caixa cobre a dívida por pouco. Abaixo do covenant padrão de mercado, o que pode gerar restrições contratuais.",vermelho:"Abaixo de 1.05x: o caixa gerado é insuficiente para pagar juros e amortização. A empresa precisaria de caixa acumulado ou novas captações."},
 ncg_receita:{verde:"Até 12% da receita presa no ciclo operacional, eficiente. Sobra mais caixa livre para pagar dívida ou investir.",amarelo:"12% a 20%: nível normal, compatível com a média de grandes empresas. Há oportunidade de melhorar negociando prazos com fornecedores e clientes.",laranja:"20% a 30%: parte significativa da receita fica travada entre estoque, contas a receber e contas a pagar. Reduz o caixa disponível para dívida.",vermelho:"Acima de 30%: o ciclo de caixa longo compromete seriamente a geração de caixa. Priorize encurtar prazos de recebimento e estoque."},
@@ -132,14 +132,24 @@ function fX(v,d){d=d||1;return v===Infinity?"∞":`${v.toFixed(d).replace(".",",
 function fP(v,d){d=d||1;return`${v.toFixed(d).replace(".",",")}%`;}
 function fT(v){return`${(v*100).toFixed(2).replace(".",",")}%`;}
 
+// --- Email validation ---
+const EMAIL_REGEX=/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+function validarEmail(v){const s=(v||"").trim();if(!s)return"Informe seu e-mail.";if(!EMAIL_REGEX.test(s))return"Informe um e-mail válido (ex: nome@empresa.com).";return"";}
+const WEBHOOK_EMAIL_URL="TODO_WEBHOOK_URL";
+async function enviarEmailWebhook(email){if(!WEBHOOK_EMAIL_URL||WEBHOOK_EMAIL_URL==="TODO_WEBHOOK_URL"){console.warn("[DeFin] WEBHOOK_EMAIL_URL não configurado.");return;}try{await fetch(WEBHOOK_EMAIL_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,origem:"calculadora-capacidade-endividamento",timestamp:new Date().toISOString()})});}catch(err){console.warn("[DeFin] Falha ao enviar webhook:",err);}}
+
+const DEFAULT_PRAZO_ANOS=5;
+
 // --- Main calculate ---
-function calc(receita,margem,ciclo,setor,divida,taxa,capex){
+function calc(receita,margem,ciclo,setor,divida,taxa,capex,prazo){
 const sd=SM[setor]||SM[Setor.OUTROS];
 const rTaxa=taxa??P.RATE,rCapex=capex??receita*sd.capexPct,rDiv=divida??0,td=rDiv>0;
+const resolvedPrazo=prazo&&prazo>0?prazo:DEFAULT_PRAZO_ANOS;
+const amortRate=1/resolvedPrazo;
 
 const ebitda=receita*(margem/100),ncg=(receita/365)*ciclo,ncgP=(ncg/receita)*100;
 const cfads=ebitda*P.PT-rCapex,cfadsP=(cfads/receita)*100;
-const df=rDiv*rTaxa,srv=df+rDiv*P.AMORT;
+const df=rDiv*rTaxa,srv=df+rDiv*amortRate;
 
 const ms=[];
 // D/EBITDA
@@ -181,7 +191,7 @@ const cens=[
 {id:"otimista",label:"Otimista",eM:1.1,cM:.9,tA:-.01,mM:3.5}
 ].map(c=>{
 const cE=ebitda*c.eM,cC=rCapex*c.cM,cF=cE*P.PT-cC,cT=rTaxa+c.tA;
-const capM=cE*c.mM,den=cT+P.AMORT,capF=cF>0&&den>0?cF/den:0;
+const capM=cE*c.mM,den=cT+amortRate,capF=cF>0&&den>0?cF/den:0;
 const cap=Math.max(0,Math.min(capM,capF));
 return{...c,ebitda:cE,cfads:cF,capM,capF,cap,mEq:ebitda>0?cap/ebitda:0};
 });
@@ -351,6 +361,7 @@ const[set,setSet]=useState(init?.set||"");
 const[div,setDiv]=useState(init?.div||"");
 const[tax,setTax]=useState(init?.tax||"");
 const[cap,setCap]=useState(init?.cap||"");
+const[prazo,setPrazo]=useState(init?.prazo||5);
 const[errs,setErrs]=useState({});
 const[tch,setTch]=useState({});
 const[shk,setShk]=useState(null);
@@ -382,7 +393,8 @@ if(Object.keys(er).length>0){const f=Object.keys(er)[0];setShk(f);setTimeout(()=
 const el=document.getElementById("i-"+f);el&&el.focus();return;}
 onCalc({receita:pn(rec),margem:pn(mar),ciclo:pn(cic),setor:set||Setor.OUTROS,
 divida:pn(div)||undefined,taxa:pn(tax)?pn(tax)/100:undefined,capex:pn(cap)||undefined,
-saved:{rec,mar,cic,optO,set,div,tax,cap}});};
+prazo:Number(prazo)||5,
+saved:{rec,mar,cic,optO,set,div,tax,cap,prazo}});};
 
 const ss=f=>shk===f?{animation:"shake .4s ease"}:{};
 
@@ -408,7 +420,19 @@ return e("form",{onSubmit:submit,noValidate:true},
       e(SelectField,{id:"i-set",label:"Setor de atuação",value:set,onChange:setSet,placeholder:"Selecione seu setor",options:SETORES_LIST.map(s=>({v:s.id,l:s.nome}))}),
       e(InputField,{id:"i-div",label:"Dívida bruta atual (R$)",placeholder:"Ex: 5.000.000",value:div,onChange:setDiv,inputMode:"numeric",help:"A soma de todos os empréstimos bancários, financiamentos, debêntures e outras dívidas financeiras (de curto e longo prazo). Não inclua contas a pagar do dia a dia (fornecedores, salários, impostos)."}),
       e(InputField,{id:"i-tax",label:"Taxa de juros média (% a.a.)",placeholder:"Ex: 14.25",suffix:"% a.a.",value:tax,onChange:setTax,inputMode:"decimal",help:"A taxa de juros média de todas as suas dívidas, ponderada pelo valor de cada uma. Se não souber, a calculadora usará como padrão CDI + 3% ao ano (14,25%), que é uma referência de mercado para empresas de médio porte."}),
-      e(InputField,{id:"i-cap",label:"Investimento anual de manutenção (R$)",placeholder:"Ex: 900.000",value:cap,onChange:setCap,inputMode:"numeric",help:"Quanto a empresa gasta por ano para manter máquinas, equipamentos e infraestrutura funcionando (não inclui investimentos para crescimento). Se não souber, a calculadora usará a média do setor, que varia de 2% a 7,5% da receita."}))),
+      e(InputField,{id:"i-cap",label:"Investimento anual de manutenção (R$)",placeholder:"Ex: 900.000",value:cap,onChange:setCap,inputMode:"numeric",help:"Quanto a empresa gasta por ano para manter máquinas, equipamentos e infraestrutura funcionando (não inclui investimentos para crescimento). Se não souber, a calculadora usará a média do setor, que varia de 2% a 7,5% da receita."}),
+      // Slider de prazo
+      e("div",{style:{marginBottom:20}},
+        e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:6}},
+          e("label",{htmlFor:"i-prazo",style:{fontSize:14,fontWeight:500,color:"#111827"}},"Prazo desejado da operação"),
+          e("span",{style:{fontSize:14,fontWeight:600,color:"#2563EB"}},prazo," ",Number(prazo)===1?"ano":"anos")),
+        e("input",{id:"i-prazo",type:"range",min:1,max:20,step:1,value:prazo,
+          onChange:ev=>setPrazo(Number(ev.target.value)),
+          style:{width:"100%",accentColor:"#2563EB",cursor:"pointer"},
+          "aria-label":"Prazo desejado da operação em anos"}),
+        e("div",{style:{display:"flex",justifyContent:"space-between",fontSize:11,color:"#9CA3AF",marginTop:2}},
+          e("span",null,"1 ano"),e("span",null,"20 anos")),
+        e("div",{style:{fontSize:13,color:"#6B7280",marginTop:6,lineHeight:"1.5"}},"Usado para calcular a amortização do principal no serviço da dívida. Se não ajustado, consideramos 5 anos como referência padrão.")))),
 
   e("button",{type:"submit",disabled:!canS,
     style:{width:"100%",height:56,borderRadius:10,border:"none",background:canS?"linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%)":"#D1D5DB",
@@ -505,8 +529,8 @@ return e("div",null,
 // ═══════════════════════════════════════════════════════════════════
 // SCREEN 4.CAPTURE
 // ═══════════════════════════════════════════════════════════════════
-function Screen4({onSubmit,onBack}){
-const[em,setEm]=useState("");const[nm,setNm]=useState("");const[emp,setEmp]=useState("");
+function Screen4({onSubmit,onBack,initialEmail}){
+const[em,setEm]=useState(initialEmail||"");const[nm,setNm]=useState("");const[emp,setEmp]=useState("");
 const[cg,setCg]=useState("");const[tel,setTel]=useState("");const[con,setCon]=useState(false);const[errs,setErrs]=useState({});
 
 const submit=ev=>{ev.preventDefault();const e={};
@@ -515,13 +539,13 @@ if(!nm)e.nm="Informe seu nome.";if(!emp)e.emp="Informe o nome da empresa.";
 if(!con)e.con="É necessário concordar para continuar.";
 setErrs(e);if(Object.keys(e).length===0)onSubmit({email:em,nome:nm,empresa:emp,cargo:cg,tel});};
 
-const wrnE=em&&/^[^@]+@(gmail|hotmail|outlook|yahoo)\./i.test(em)?"Preferimos email corporativo, mas você pode continuar com este.":null;
+const wrnE=null;
 
 return e("form",{onSubmit:submit,noValidate:true},
   e("button",{type:"button",onClick:onBack,style:{background:"none",border:"none",cursor:"pointer",color:"#2563EB",fontSize:14,fontWeight:500,padding:0,marginBottom:16,display:"flex",alignItems:"center",gap:4}},"← Voltar ao resultado"),
   e("h2",{style:{fontSize:22,fontWeight:700,color:"#111827",margin:"0 0 6px"}},"Receba seu diagnóstico personalizado"),
   e("p",{style:{fontSize:15,color:"#6B7280",margin:"0 0 24px"}},"Preencha seus dados abaixo. Um especialista da DeFin vai analisar seu resultado e entrar em contato em até 24 horas com um diagnóstico completo e personalizado."),
-  e(InputField,{id:"c-em",label:"Email corporativo",placeholder:"nome@empresa.com.br",value:em,onChange:setEm,error:errs.em,warning:wrnE,required:true}),
+  e(InputField,{id:"c-em",label:"Email",placeholder:"nome@empresa.com.br",value:em,onChange:setEm,error:errs.em,warning:wrnE,required:true}),
   e(InputField,{id:"c-nm",label:"Seu nome",placeholder:"João da Silva",value:nm,onChange:setNm,error:errs.nm,required:true}),
   e(InputField,{id:"c-emp",label:"Nome da empresa",placeholder:"Empresa S.A.",value:emp,onChange:setEmp,error:errs.emp,required:true}),
   e(InputField,{id:"c-cg",label:"Seu cargo",placeholder:"CFO, Controller, Sócio...",value:cg,onChange:setCg}),
@@ -534,7 +558,7 @@ return e("form",{onSubmit:submit,noValidate:true},
     " ",errs.con),
   e("button",{type:"submit",style:{width:"100%",height:52,borderRadius:8,border:"none",background:"#2563EB",color:"#fff",fontSize:16,fontWeight:600,cursor:"pointer",marginTop:8,transition:"background 150ms ease"},
     onMouseEnter:ev=>ev.target.style.background="#1D4ED8",onMouseLeave:ev=>ev.target.style.background="#2563EB"},"Enviar e agendar diagnóstico"),
-  e("p",{style:{fontSize:12,color:"#9CA3AF",textAlign:"center",marginTop:10}},"Seus dados estão seguros. ",e("a",{href:"#"},"Política de privacidade"),".")
+  e("p",{style:{fontSize:12,color:"#9CA3AF",textAlign:"center",marginTop:10}},"Seus dados estão seguros. ",e("a",{href:"https://defin.global/politica-de-privacidade",target:"_blank",rel:"noopener noreferrer",style:{color:"#2563EB"}},"Política de Privacidade"),".")
 );}
 
 // ═══════════════════════════════════════════════════════════════════
@@ -573,16 +597,43 @@ return e("div",{className:"step-indicator","aria-label":"Progresso"},
   steps.map((s,i)=>e("div",{key:s.k,className:`step-dot${i===idx?" step-dot--active":""}${i<idx?" step-dot--done":""}`,
     "aria-label":`${s.l}${i===idx?" (atual)":i<idx?" (concluído)":""}`,title:s.l})));}
 
+function ScreenEmailGate({onUnlock,onBack}){
+const[email,setEmail]=useState("");const[erro,setErro]=useState("");const[enviando,setEnviando]=useState(false);
+const submit=async ev=>{ev&&ev.preventDefault();const msg=validarEmail(email);if(msg){setErro(msg);return;}
+setErro("");setEnviando(true);await enviarEmailWebhook(email.trim());setEnviando(false);onUnlock(email.trim());};
+return e("form",{onSubmit:submit,noValidate:true},
+  e("div",{style:{textAlign:"center",marginBottom:20}},
+    e("div",{style:{display:"inline-flex",alignItems:"center",justifyContent:"center",width:56,height:56,borderRadius:28,background:"#EFF6FF",border:"1.5px solid #BFDBFE",marginBottom:14}},
+      e("span",{style:{fontSize:26}},"🔒")),
+    e("h2",{style:{fontSize:22,fontWeight:700,color:"#111827",margin:"0 0 8px"}},"Seu resultado está pronto"),
+    e("p",{style:{fontSize:15,color:"#6B7280",margin:0,lineHeight:"1.55"}},"Informe seu ",e("strong",null,"e-mail")," para acessar o relatório completo e receber uma cópia por e-mail.")),
+  e(InputField,{id:"gate-email",label:"E-mail",placeholder:"nome@suaempresa.com.br",value:email,
+    onChange:v=>{setEmail(v);if(erro)setErro("");},error:erro,inputMode:"email",required:true}),
+  e("button",{type:"submit",disabled:enviando,
+    style:{width:"100%",height:52,borderRadius:8,border:"none",background:enviando?"#93C5FD":"#2563EB",
+      color:"#fff",fontSize:16,fontWeight:600,cursor:enviando?"wait":"pointer",marginTop:8,transition:"background 150ms ease"},
+    onMouseEnter:ev=>{if(!enviando)ev.target.style.background="#1D4ED8";},
+    onMouseLeave:ev=>{if(!enviando)ev.target.style.background="#2563EB";}},
+    enviando?"Liberando...":"Ver meu resultado"),
+  e("p",{style:{fontSize:12,color:"#9CA3AF",textAlign:"center",marginTop:14,lineHeight:"1.6"}},
+    "Ao continuar, você concorda com nossa ",
+    e("a",{href:"https://defin.global/politica-de-privacidade",target:"_blank",rel:"noopener noreferrer",style:{color:"#2563EB",textDecoration:"underline"}},"Política de Privacidade"),"."),
+  onBack&&e("div",{style:{textAlign:"center",marginTop:14}},
+    e("button",{type:"button",onClick:onBack,
+      style:{background:"none",border:"none",color:"#6B7280",fontSize:13,cursor:"pointer",textDecoration:"underline"}},
+      "Voltar e revisar os dados")));}
+
 function App(){
 const[scr,setScr]=useState("inputs");
 const[result,setResult]=useState(null);
 const[saved,setSaved]=useState(null);
 const[capEmail,setCapEmail]=useState("");
+const[gateEmail,setGateEmail]=useState("");
 const wRef=useRef(null);
 
 const doCalc=vals=>{setSaved(vals.saved);setScr("processing");
-setTimeout(()=>{const r=calc(vals.receita,vals.margem,vals.ciclo,vals.setor,vals.divida,vals.taxa,vals.capex);
-setResult(r);setScr("results");wRef.current&&wRef.current.scrollIntoView({behavior:"smooth",block:"start"});},1800);};
+setTimeout(()=>{const r=calc(vals.receita,vals.margem,vals.ciclo,vals.setor,vals.divida,vals.taxa,vals.capex,vals.prazo);
+setResult(r);setScr(gateEmail?"results":"emailgate");wRef.current&&wRef.current.scrollIntoView({behavior:"smooth",block:"start"});},1800);};
 
 const isResults=scr==="results";
 
@@ -604,8 +655,9 @@ return e("div",null,
     scr!=="processing"&&e(StepIndicator,{current:scr}),
     scr==="inputs"&&e(Screen1,{onCalc:doCalc,init:saved}),
     scr==="processing"&&e(Screen2,null),
+    scr==="emailgate"&&e(ScreenEmailGate,{onUnlock:em=>{setGateEmail(em);setScr("results");wRef.current&&wRef.current.scrollIntoView({behavior:"smooth",block:"start"});},onBack:()=>setScr("inputs")}),
     scr==="results"&&e(Screen3,{r:result,onRecalc:()=>setScr("inputs"),onCapture:()=>{setScr("capture");wRef.current&&wRef.current.scrollIntoView({behavior:"smooth",block:"start"});}}),
-    scr==="capture"&&e(Screen4,{onSubmit:d=>{setCapEmail(d.email);setScr("confirm");wRef.current&&wRef.current.scrollIntoView({behavior:"smooth",block:"start"});},onBack:()=>setScr("results")}),
+    scr==="capture"&&e(Screen4,{onSubmit:d=>{setCapEmail(d.email);setScr("confirm");wRef.current&&wRef.current.scrollIntoView({behavior:"smooth",block:"start"});},onBack:()=>setScr("results"),initialEmail:gateEmail}),
     scr==="confirm"&&e(Screen5,{email:capEmail})),
 
   // Footer
@@ -615,7 +667,7 @@ return e("div",null,
       e("div",{style:{display:"flex",justifyContent:"center",gap:16,fontSize:12,color:"#9CA3AF"}},
         e("a",{href:"https://defin.global",style:{color:"#6B7280"}},"defin.global"),
         e("span",null,"·"),
-        e("a",{href:"#",style:{color:"#6B7280"}},"Política de privacidade"),
+        e("a",{href:"https://defin.global/politica-de-privacidade",target:"_blank",rel:"noopener noreferrer",style:{color:"#6B7280"}},"Política de Privacidade"),
         e("span",null,"·"),
         e("a",{href:"#",style:{color:"#6B7280"}},"Termos de uso"))))));}
 
