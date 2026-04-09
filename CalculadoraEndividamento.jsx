@@ -687,7 +687,7 @@ function ScreenInputs({ onCalculate, initialValues }) {
             <input
               id="input-prazo"
               type="range"
-              min={2}
+              min={1}
               max={20}
               step={1}
               value={prazo}
@@ -696,7 +696,7 @@ function ScreenInputs({ onCalculate, initialValues }) {
               aria-label="Prazo desejado da operação em anos"
             />
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#9CA3AF", marginTop: 2 }}>
-              <span>2 anos</span>
+              <span>1 ano</span>
               <span>20 anos</span>
             </div>
             <div style={{ fontSize: 13, color: "#6B7280", marginTop: 6, lineHeight: 1.5 }}>
@@ -894,26 +894,19 @@ function ScreenResults({ result, onRecalculate, onCapture }) {
   );
 }
 
-// --- Gate de e-mail corporativo (exigido antes de ver o resultado) ---
-const DOMINIOS_PESSOAIS_BLOQUEADOS = [
-  "gmail.com", "googlemail.com", "hotmail.com", "hotmail.com.br", "outlook.com", "outlook.com.br",
-  "live.com", "yahoo.com", "yahoo.com.br", "ymail.com", "icloud.com", "me.com", "mac.com",
-  "msn.com", "bol.com.br", "uol.com.br", "terra.com.br", "ig.com.br", "r7.com",
-  "protonmail.com", "proton.me", "zoho.com", "gmx.com", "aol.com",
-];
-
+// --- Gate de e-mail (exigido antes de ver o resultado) ---
 // TODO: substituir pela URL real do webhook de leads
 const WEBHOOK_EMAIL_URL = "TODO_WEBHOOK_URL";
 
-function validarEmailCorporativo(email) {
+// Regex robusto para validar formato de e-mail real:
+// - parte local sem espaços, com caracteres válidos
+// - domínio com pelo menos um ponto e TLD de 2+ letras
+const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+function validarEmail(email) {
   const valor = (email || "").trim();
-  if (!valor) return "Informe seu e-mail corporativo.";
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!regex.test(valor)) return "Informe um e-mail válido (ex: nome@empresa.com).";
-  const dominio = valor.split("@")[1].toLowerCase();
-  if (DOMINIOS_PESSOAIS_BLOQUEADOS.includes(dominio)) {
-    return "Use seu e-mail corporativo — domínios pessoais (gmail, hotmail, etc.) não são aceitos.";
-  }
+  if (!valor) return "Informe seu e-mail.";
+  if (!EMAIL_REGEX.test(valor)) return "Informe um e-mail válido (ex: nome@empresa.com).";
   return "";
 }
 
@@ -944,7 +937,7 @@ function ScreenEmailGate({ onUnlock, onBack }) {
 
   const handleSubmit = async (e) => {
     e?.preventDefault?.();
-    const msg = validarEmailCorporativo(email);
+    const msg = validarEmail(email);
     if (msg) { setErro(msg); return; }
     setErro("");
     setEnviando(true);
@@ -967,13 +960,13 @@ function ScreenEmailGate({ onUnlock, onBack }) {
           Seu resultado está pronto
         </h2>
         <p style={{ fontSize: 15, color: "#6B7280", margin: 0, lineHeight: 1.55 }}>
-          Informe seu <strong>e-mail corporativo</strong> para acessar o relatório completo e receber uma cópia por e-mail.
+          Informe seu <strong>e-mail</strong> para acessar o relatório completo e receber uma cópia por e-mail.
         </p>
       </div>
 
       <InputField
         id="gate-email"
-        label="E-mail corporativo"
+        label="E-mail"
         placeholder="nome@suaempresa.com.br"
         value={email}
         onChange={(v) => { setEmail(v); if (erro) setErro(""); }}
@@ -1046,8 +1039,7 @@ function ScreenCapture({ onSubmit, onBack, initialEmail }) {
     if (Object.keys(errs).length === 0) onSubmit({ email, nome, empresa, cargo, tel });
   };
 
-  const emailWarning = email && /^[^@]+@(gmail|hotmail|outlook|yahoo)\./i.test(email)
-    ? "Preferimos email corporativo, mas você pode continuar com este." : null;
+  const emailWarning = null;
 
   return (
     <form onSubmit={handleSubmit} noValidate>
@@ -1058,7 +1050,7 @@ function ScreenCapture({ onSubmit, onBack, initialEmail }) {
       <h2 style={{ fontSize: 22, fontWeight: 700, color: "#111827", margin: "0 0 6px", fontFamily: "'DM Sans', sans-serif" }}>Receba seu diagnóstico personalizado</h2>
       <p style={{ fontSize: 15, color: "#6B7280", margin: "0 0 24px" }}>Preencha seus dados abaixo. Um especialista da DeFin vai analisar seu resultado e entrar em contato em até 24 horas com um diagnóstico completo e personalizado.</p>
 
-      <InputField id="cap-email" label="Email corporativo" placeholder="nome@empresa.com.br" value={email} onChange={setEmail} error={errors.email} warning={emailWarning} required />
+      <InputField id="cap-email" label="Email" placeholder="nome@empresa.com.br" value={email} onChange={setEmail} error={errors.email} warning={emailWarning} required />
       <InputField id="cap-nome" label="Seu nome" placeholder="João da Silva" value={nome} onChange={setNome} error={errors.nome} required />
       <InputField id="cap-empresa" label="Nome da empresa" placeholder="Empresa S.A." value={empresa} onChange={setEmpresa} error={errors.empresa} required />
       <InputField id="cap-cargo" label="Seu cargo" placeholder="CFO, Controller, Sócio..." value={cargo} onChange={setCargo} />
